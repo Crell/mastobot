@@ -20,7 +20,7 @@ If you discover any security related issues, please email larry at garfieldtech 
 
 ## License
 
-The Lesser GPL version 3 or later. Please see [License File](LICENSE.md) for more information.
+The Affero GPL version 3 or later. Please see [License File](LICENSE.md) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/Crell/mastobot.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/License-LGPLv3-green.svg?style=flat-square
