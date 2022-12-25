@@ -6,6 +6,8 @@ namespace Crell\Mastobot;
 
 use Colorfield\Mastodon\MastodonAPI;
 use Colorfield\Mastodon\MastodonOAuth;
+use Crell\Serde\Serde;
+use Crell\Serde\SerdeCommon;
 use Pimple\Container;
 
 class MastobotApp extends Container
@@ -14,8 +16,13 @@ class MastobotApp extends Container
     {
         parent::__construct($values);
 
-        $this['config'] = static function (Container $c) {
-            return json_decode(file_get_contents('mastobot.json'), true, 512, JSON_THROW_ON_ERROR);
+        $this[Serde::class] = static fn (Container $c) => new SerdeCommon();
+
+        $this[Config::class] = static function (Container $c) {
+            /** @var Serde $serde */
+            $serde = $c[Serde::class];
+
+            return $serde->deserialize(file_get_contents('mastobot.json'), from: 'json', to: Config::class);
         };
 
         $this['app.name'] = static fn(Container $c) => $c['config']['app.name'] ?? throw new \InvalidArgumentException('No app.name specified.');
@@ -25,10 +32,12 @@ class MastobotApp extends Container
         $this['token'] = static fn(Container $c) => $c['config']['token'] ?? throw new \InvalidArgumentException('No token specified.');
 
         $this[MastodonOAuth::class] = static function (Container $c) {
-            $oAuth = new MastodonOAuth($c['app.name'], $c['app.instance']);
-            $oAuth->config->setClientId($c['client_id']);
-            $oAuth->config->setClientSecret($c['client_secret']);
-            $oAuth->config->setBearer($c['token']);
+            /** @var Config $config */
+            $config = $c[Config::class];
+            $oAuth = new MastodonOAuth($config->appName, $config->appInstance);
+            $oAuth->config->setClientId($config->clientId);
+            $oAuth->config->setClientSecret($config->clientSecret);
+            $oAuth->config->setBearer($config->bearerToken);
             return $oAuth;
         };
 
