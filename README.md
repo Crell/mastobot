@@ -22,13 +22,13 @@ If you discover any security related issues, please email larry at garfieldtech 
 
 The Lesser GPL version 3 or later. Please see [License File](LICENSE.md) for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/Crell/Tukio.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/Crell/mastobot.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/License-LGPLv3-green.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/Crell/Tukio.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/Crell/mastobot.svg?style=flat-square
 
-[link-packagist]: https://packagist.org/packages/Crell/Tukio
-[link-scrutinizer]: https://scrutinizer-ci.com/g/Crell/Tukio/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/Crell/Tukio
-[link-downloads]: https://packagist.org/packages/Crell/Tukio
+[link-packagist]: https://packagist.org/packages/Crell/mastobot
+[link-scrutinizer]: https://scrutinizer-ci.com/g/Crell/mastobot/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/Crell/mastobot
+[link-downloads]: https://packagist.org/packages/Crell/mastobot
 [link-author]: https://github.com/Crell
 [link-contributors]: ../../contributors
