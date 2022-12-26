@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Crell\Mastobot;
 
 
+use Crell\Serde\Attributes\Field;
+use Crell\Serde\Renaming\Cases;
+
 /**
  * Value Object of a Toot.
  *
@@ -34,11 +37,13 @@ class Toot
      */
     public function __construct(
         public string $status,
+        #[Field(serializedName: 'in_reply_to_id')]
         public ?string $replyTo = null,
         public bool $sensitive = false,
         public Visibility $visibility = Visibility::Unlisted,
         public ?string $spoiler_text = null,
         public ?string $language = null,
+        #[Field(renameWith: Cases::snake_case)]
         public ?\DateTimeImmutable $scheduledAt = null,
     ) {}
 

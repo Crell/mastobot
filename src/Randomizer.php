@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
+use Crell\Serde\Serde;
 use Psr\Clock\ClockInterface;
 
 class Randomizer
@@ -11,6 +12,7 @@ class Randomizer
     public function __construct(
         protected readonly Config $config,
         protected readonly ClockInterface $clock,
+        protected readonly Serde $serde,
     ) {}
 
     public function previousBatchCompleted(RandomizerDef $def, State $state): bool
@@ -41,53 +43,61 @@ class Randomizer
      */
     public function makeToots(RandomizerDef $def): \Generator
     {
-        /** @var \SplFileInfo[] $postDirs */
-        $postDirs = iterator_to_array(new \FilesystemIterator($def->directory,\FilesystemIterator::SKIP_DOTS));
-        shuffle($postDirs);
+        /** @var \SplFileInfo[] $postList */
+        $postList = iterator_to_array(new \FilesystemIterator($def->directory,\FilesystemIterator::SKIP_DOTS));
+        shuffle($postList);
 
         $now = $this->clock->now();
         $postTime = $now->add($this->getRandomizedGap($def));
 
-        foreach ($postDirs as $dir) {
-            $toot = $this->loadToot($dir);
+        foreach ($postList as $record) {
+            $toot = $this->loadToot($record);
             // Error handling is just silent ignore for now.
             if (!$toot) {
                 continue;
             }
             $toot->scheduledAt = $postTime;
             $postTime = $postTime->add($this->getRandomizedGap($def));
-            yield $toot;
+            yield $record->getFilename() => $toot;
         }
     }
 
     protected function loadToot(\SplFileInfo $record): ?Toot
     {
-        // @todo Support plain files, not in directories.
-
         // Allow just plain text files as tweets, with no directory.
         if (!$record->isDir() && $record->getExtension() === 'txt') {
             $status = file_get_contents((string)$record);
             return new Toot($status);
         }
 
-        // __toString is black magic.
-        $textStatus = "$record/status.txt";
-
-        if (file_exists($textStatus)) {
-            $status = file_get_contents($textStatus);
-            return new Toot($status);
+        // Allow just JSON files as tweets, with no directory.
+        if (!$record->isDir() && $record->getExtension() === 'json') {
+            $status = file_get_contents((string)$record);
+            /** @var Toot */
+            return $this->serde->deserialize($status, from: 'json', to: Toot::class);
         }
 
-        // @todo Make this actually work, using Serde.
-        /*
-        $jsonStatus = "$dir/status.json";
-        if (file_exists($jsonStatus)) {
-            $status = file_get_contents($jsonStatus);
-            return new Toot($status);
-        }
-        */
+        // Directory support is mostly for later, once we want to allow
+        // for attached media.  If you're not doing that, you probably don't
+        // need to bother with directories.
 
-        // @todo Add support for attaching media.
+        // Allow a directory with either JSON or text.
+        if ($record->isDir()) {
+            $textStatus = "$record/status.txt";
+            if (file_exists($textStatus)) {
+                $status = file_get_contents($textStatus);
+                return new Toot($status);
+            }
+
+            $jsonStatus = "$record/status.json";
+            if (file_exists($jsonStatus)) {
+                $status = file_get_contents($jsonStatus);
+                /** @var Toot */
+                return $this->serde->deserialize($status, from: 'json', to: Toot::class);
+            }
+
+            // @todo Add support for attaching media.
+        }
 
         // If no toot could be loaded from here.
         return null;

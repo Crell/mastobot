@@ -7,6 +7,7 @@ namespace Crell\Mastobot;
 use bovigo\vfs\vfsStream;
 use bovigo\vfs\vfsStreamContent;
 use bovigo\vfs\vfsStreamDirectory;
+use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
 
 class RandomizerTest extends TestCase
@@ -33,6 +34,10 @@ class RandomizerTest extends TestCase
                     'status.txt'    => 'Testing C',
                 ],
                 'd.txt' => 'Testing D',
+                'e.json' => '{"status": "Testing E", "visibility": "public"}',
+                'f' => [
+                    'status.json' => '{"status": "Testing F", "spoiler_text": "spoiler"}',
+                ]
             ],
         ];
         $this->root = vfsStream::setup('root', null, $structure);
@@ -49,7 +54,7 @@ class RandomizerTest extends TestCase
             randomizers: [new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5)],
         );
 
-        $r = new Randomizer($c, $now);
+        $r = new Randomizer($c, $now, new SerdeCommon());
 
         $s = new State();
         $s->randomizerTimestamps['data'] = $finished;
@@ -67,7 +72,7 @@ class RandomizerTest extends TestCase
             randomizers: [new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5)],
         );
 
-        $r = new Randomizer($c, $now);
+        $r = new Randomizer($c, $now, new SerdeCommon());
 
         $s = new State();
         $s->randomizerTimestamps[$this->dataDir->url()] = $finished;
@@ -85,18 +90,22 @@ class RandomizerTest extends TestCase
             randomizers: [$def],
         );
 
-        $r = new Randomizer($c, $now);
+        $r = new Randomizer($c, $now, new SerdeCommon());
 
         /** @var Toot[] $toots */
         $toots = iterator_to_array($r->makeToots($def));
 
         self::assertIsArray($toots);
-        self::assertCount(4, $toots);
+        self::assertCount(6, $toots);
 
-        self::assertSame(Visibility::Unlisted, $toots[0]->visibility);
-        self::assertSame(Visibility::Unlisted, $toots[1]->visibility);
-        self::assertSame(Visibility::Unlisted, $toots[2]->visibility);
-        self::assertSame(Visibility::Unlisted, $toots[3]->visibility);
+        self::assertSame(Visibility::Unlisted, $toots['a']->visibility);
+        self::assertSame(Visibility::Unlisted, $toots['b']->visibility);
+        self::assertSame(Visibility::Unlisted, $toots['c']->visibility);
+        self::assertSame(Visibility::Unlisted, $toots['d.txt']->visibility);
+        self::assertSame(Visibility::Public, $toots['e.json']->visibility);
+        self::assertSame(Visibility::Unlisted, $toots['f']->visibility);
+
+        self::assertSame('spoiler', $toots['f']->spoiler_text);
 
         // Pair each message with the one right after it.
         $pairs = array_map(null, $toots, [null, ...$toots]);

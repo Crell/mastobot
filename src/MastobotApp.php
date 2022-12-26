@@ -42,7 +42,7 @@ class MastobotApp extends Container
         $this[ClockInterface::class] = static fn(Container $c) => new UtcClock();
 
         $this[Randomizer::class] = static fn (Container $c)
-            => new Randomizer($c[Config::class], $c[ClockInterface::class]);
+            => new Randomizer($c[Config::class], $c[ClockInterface::class], $c[Serde::class]);
 
         $this[StateLoader::class] = static fn (Container $c)
             => new StateLoader($c[Config::class]->stateFile, $c[Serde::class]);
