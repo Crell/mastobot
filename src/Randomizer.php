@@ -60,12 +60,18 @@ class Randomizer
         }
     }
 
-    protected function loadToot(\SplFileInfo $dir): ?Toot
+    protected function loadToot(\SplFileInfo $record): ?Toot
     {
         // @todo Support plain files, not in directories.
 
+        // Allow just plain text files as tweets, with no directory.
+        if (!$record->isDir() && $record->getExtension() === 'txt') {
+            $status = file_get_contents((string)$record);
+            return new Toot($status);
+        }
+
         // __toString is black magic.
-        $textStatus = "$dir/status.txt";
+        $textStatus = "$record/status.txt";
 
         if (file_exists($textStatus)) {
             $status = file_get_contents($textStatus);

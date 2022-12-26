@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Mastobot;
 
 use bovigo\vfs\vfsStream;
+use bovigo\vfs\vfsStreamContent;
 use bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 
@@ -14,28 +15,28 @@ class RandomizerTest extends TestCase
 
     private vfsStreamDirectory $root;
 
+    private vfsStreamContent $dataDir;
+
     public function setUp(): void
     {
         parent::setUp();
-        $this->root = vfsStream::setup();
 
-        //$this->configFile = vfsStream::newFile(Config::ConfigFileName);
-
-        $dataDir = vfsStream::newDirectory('data');
-        $dataDir->at($this->root);
-        $tweetA = vfsStream::newDirectory('a');
-        $tweetA->at($this->root);
-        $tweetB = vfsStream::newDirectory('b');
-        $tweetB->at($this->root);
-        $tweetC = vfsStream::newDirectory('c');
-        $tweetC->at($this->root);
-
-        $status = vfsStream::newFile('status.txt')->withContent('Testing A');
-        $status->at($tweetA);
-        $status = vfsStream::newFile('status.txt')->withContent('Testing B');
-        $status->at($tweetB);
-        $status = vfsStream::newFile('status.txt')->withContent('Testing C');
-        $status->at($tweetC);
+        $structure = [
+            'data' => [
+                'a' => [
+                    'status.txt'    => 'Testing A',
+                ],
+                'b' => [
+                    'status.txt'    => 'Testing B',
+                ],
+                'c' => [
+                    'status.txt'    => 'Testing C',
+                ],
+                'd.txt' => 'Testing D',
+            ],
+        ];
+        $this->root = vfsStream::setup('root', null, $structure);
+        $this->dataDir = $this->root->getChild('data');
     }
 
     /** @test */
@@ -45,7 +46,7 @@ class RandomizerTest extends TestCase
         $finished = (new \DateTimeImmutable('2020-01-01'))->format('U');
 
         $c = $this->makeConfig(
-            randomizers: [new RandomizerDef(directory: 'data', minHours: 1, maxHours: 5)],
+            randomizers: [new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5)],
         );
 
         $r = new Randomizer($c, $now);
@@ -63,13 +64,13 @@ class RandomizerTest extends TestCase
         $finished = (new \DateTimeImmutable('2022-12-25 12:05'))->format('U');
 
         $c = $this->makeConfig(
-            randomizers: [new RandomizerDef(directory: 'data', minHours: 1, maxHours: 5)],
+            randomizers: [new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5)],
         );
 
         $r = new Randomizer($c, $now);
 
         $s = new State();
-        $s->randomizerTimestamps['data'] = $finished;
+        $s->randomizerTimestamps[$this->dataDir->url()] = $finished;
 
         self::assertFalse($r->previousBatchCompleted($c->randomizers[0], $s));
     }
@@ -77,7 +78,7 @@ class RandomizerTest extends TestCase
     /** @test */
     public function validate_randomizer(): void
     {
-        $def = new RandomizerDef(directory: 'data', minHours: 1, maxHours: 5);
+        $def = new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
 
         $now = new FrozenClock(new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')));
         $c = $this->makeConfig(
@@ -86,17 +87,16 @@ class RandomizerTest extends TestCase
 
         $r = new Randomizer($c, $now);
 
-        $s = new State();
-
         /** @var Toot[] $toots */
         $toots = iterator_to_array($r->makeToots($def));
 
         self::assertIsArray($toots);
-        self::assertCount(3, $toots);
+        self::assertCount(4, $toots);
 
         self::assertSame(Visibility::Unlisted, $toots[0]->visibility);
         self::assertSame(Visibility::Unlisted, $toots[1]->visibility);
         self::assertSame(Visibility::Unlisted, $toots[2]->visibility);
+        self::assertSame(Visibility::Unlisted, $toots[3]->visibility);
 
         // Pair each message with the one right after it.
         $pairs = array_map(null, $toots, [null, ...$toots]);
