@@ -19,9 +19,9 @@ class RunnerTest extends TestCase
     {
         $api = $this->mockMastodonAPI();
 
-        $def = new RandomizerDef(directory: 'data', minHours: 1, maxHours: 5);
+        $def = new BatchRandomizerDef(directory: 'data', minHours: 1, maxHours: 5);
         $config = $this->makeConfig(
-            randomizers: [$def],
+            batchRandomizers: [$def],
         );
 
        $randomizer = $this->mockRandomizer(3, true);
@@ -49,17 +49,17 @@ class RunnerTest extends TestCase
         };
     }
 
-    protected function mockRandomizer(int $numToots, bool $prevCompleted): Randomizer
+    protected function mockRandomizer(int $numToots, bool $prevCompleted): BatchRandomizer
     {
-        return new class($numToots, $prevCompleted) extends Randomizer {
+        return new class($numToots, $prevCompleted) extends BatchRandomizer {
             public function __construct(public int $numToots, public bool $prevCompleted) {}
 
-            public function previousBatchCompleted(RandomizerDef $def, State $state): bool
+            public function previousBatchCompleted(BatchRandomizerDef $def, State $state): bool
             {
                 return $this->prevCompleted;
             }
 
-            public function makeToots(RandomizerDef $def): \Generator
+            public function makeToots(BatchRandomizerDef $def): \Generator
             {
                 static $callCount = 1;
                 for ($i = 0; $i < $this->numToots; ++$i) {

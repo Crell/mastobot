@@ -16,7 +16,7 @@ class State
      *     Path of the directory to the unix timestamp of when the last batch will complete.
      */
     #[DictionaryField(arrayType: 'int', keyType: KeyType::String)]
-    public array $randomizerTimestamps = [];
+    public array $batchRandomizerTimestamps = [];
 
     #[Field(exclude: true)]
     private StateLoader $loader;

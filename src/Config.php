@@ -19,7 +19,7 @@ class Config
      * @param string $clientSecret
      * @param string $bearerToken
      * @param string $stateFile
-     * @param RandomizerDef[] $randomizers
+     * @param BatchRandomizerDef[] $batchRandomizers
      */
     public function __construct(
         #[Field(serializedName: 'app.name')]
@@ -39,10 +39,11 @@ class Config
 
         public readonly ?string $stateFile = null,
 
-        #[SequenceField(arrayType: RandomizerDef::class)]
-        public readonly array $randomizers = [],
-
         public readonly Visibility $defaultVisibility = Visibility::Unlisted,
+
+        #[SequenceField(arrayType: BatchRandomizerDef::class)]
+        #[Field(renameWith: Cases::snake_case)]
+        public readonly array $batchRandomizers = [],
     ) {}
 
     #[PostLoad]

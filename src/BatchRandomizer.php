@@ -7,7 +7,7 @@ namespace Crell\Mastobot;
 use Crell\Serde\Serde;
 use Psr\Clock\ClockInterface;
 
-class Randomizer
+class BatchRandomizer
 {
     public function __construct(
         protected readonly Config $config,
@@ -15,11 +15,11 @@ class Randomizer
         protected readonly Serde $serde,
     ) {}
 
-    public function previousBatchCompleted(RandomizerDef $def, State $state): bool
+    public function previousBatchCompleted(BatchRandomizerDef $def, State $state): bool
     {
         // The timestamp at which the previous batch should be done.
         // This is a unix timestamp.
-        $previousBatchEnd = $state->randomizerTimestamps[$def->directory] ?? 0;
+        $previousBatchEnd = $state->batchRandomizerTimestamps[$def->directory] ?? 0;
 
         $now = $this->clock->now()->getTimestamp();
 
@@ -38,10 +38,10 @@ class Randomizer
      * So 5 posts, set to be between 1 and 3 hours apart, could be
      * anywhere from 6 to 16 hours to get through the whole cycle.
      *
-     * @param RandomizerDef $def
+     * @param BatchRandomizerDef $def
      * @return iterable<Toot>
      */
-    public function makeToots(RandomizerDef $def): \Generator
+    public function makeToots(BatchRandomizerDef $def): \Generator
     {
         /** @var \SplFileInfo[] $postList */
         $postList = iterator_to_array(new \FilesystemIterator($def->directory,\FilesystemIterator::SKIP_DOTS));
@@ -107,7 +107,7 @@ class Randomizer
         return null;
     }
 
-    protected function getRandomizedGap(RandomizerDef $def): \DateInterval
+    protected function getRandomizedGap(BatchRandomizerDef $def): \DateInterval
     {
         $gapSeconds = \random_int($def->minSeconds(), $def->maxSeconds());
 

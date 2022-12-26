@@ -10,7 +10,7 @@ use bovigo\vfs\vfsStreamDirectory;
 use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
 
-class RandomizerTest extends TestCase
+class BatchRandomizerTest extends TestCase
 {
     use ConfigMaker;
 
@@ -51,15 +51,15 @@ class RandomizerTest extends TestCase
         $finished = (new \DateTimeImmutable('2020-01-01'))->format('U');
 
         $c = $this->makeConfig(
-            randomizers: [new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5)],
+            batchRandomizers: [new BatchRandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5)],
         );
 
-        $r = new Randomizer($c, $now, new SerdeCommon());
+        $r = new BatchRandomizer($c, $now, new SerdeCommon());
 
         $s = new State();
-        $s->randomizerTimestamps[$this->dataDir->url()] = $finished;
+        $s->batchRandomizerTimestamps[$this->dataDir->url()] = $finished;
 
-        self::assertTrue($r->previousBatchCompleted($c->randomizers[0], $s));
+        self::assertTrue($r->previousBatchCompleted($c->batchRandomizers[0], $s));
     }
 
     /** @test */
@@ -69,28 +69,28 @@ class RandomizerTest extends TestCase
         $finished = (new \DateTimeImmutable('2022-12-25 12:05'))->format('U');
 
         $c = $this->makeConfig(
-            randomizers: [new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5)],
+            batchRandomizers: [new BatchRandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5)],
         );
 
-        $r = new Randomizer($c, $now, new SerdeCommon());
+        $r = new BatchRandomizer($c, $now, new SerdeCommon());
 
         $s = new State();
-        $s->randomizerTimestamps[$this->dataDir->url()] = $finished;
+        $s->batchRandomizerTimestamps[$this->dataDir->url()] = $finished;
 
-        self::assertFalse($r->previousBatchCompleted($c->randomizers[0], $s));
+        self::assertFalse($r->previousBatchCompleted($c->batchRandomizers[0], $s));
     }
 
     /** @test */
     public function validate_randomizer(): void
     {
-        $def = new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
+        $def = new BatchRandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
 
         $now = new FrozenClock(new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')));
         $c = $this->makeConfig(
-            randomizers: [$def],
+            batchRandomizers: [$def],
         );
 
-        $r = new Randomizer($c, $now, new SerdeCommon());
+        $r = new BatchRandomizer($c, $now, new SerdeCommon());
 
         /** @var Toot[] $toots */
         $toots = iterator_to_array($r->makeToots($def));
@@ -123,15 +123,15 @@ class RandomizerTest extends TestCase
     /** @test */
     public function confirm_default_visibility_is_respected(): void
     {
-        $def = new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
+        $def = new BatchRandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
 
         $now = new FrozenClock(new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')));
         $c = $this->makeConfig(
-            randomizers: [$def],
+            batchRandomizers: [$def],
             defaultVisibility: Visibility::Private,
         );
 
-        $r = new Randomizer($c, $now, new SerdeCommon());
+        $r = new BatchRandomizer($c, $now, new SerdeCommon());
 
         /** @var Toot[] $toots */
         $toots = iterator_to_array($r->makeToots($def));

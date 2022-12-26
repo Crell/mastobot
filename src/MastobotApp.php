@@ -41,8 +41,8 @@ class MastobotApp extends Container
 
         $this[ClockInterface::class] = static fn(Container $c) => new UtcClock();
 
-        $this[Randomizer::class] = static fn (Container $c)
-            => new Randomizer($c[Config::class], $c[ClockInterface::class], $c[Serde::class]);
+        $this[BatchRandomizer::class] = static fn (Container $c)
+            => new BatchRandomizer($c[Config::class], $c[ClockInterface::class], $c[Serde::class]);
 
         $this[StateLoader::class] = static fn (Container $c)
             => new StateLoader($c[Config::class]->stateFile, $c[Serde::class]);
@@ -51,7 +51,7 @@ class MastobotApp extends Container
             => new Runner(
                 api: $c[MastodonAPI::class],
                 config: $c[Config::class],
-                randomizer: $c[Randomizer::class],
+                randomizer: $c[BatchRandomizer::class],
                 clock: $c[ClockInterface::class],
                 serde: $c[Serde::class],
             );

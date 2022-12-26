@@ -35,7 +35,7 @@ class StateLoaderTest extends TestCase
 
         $state = $l->load();
 
-        self::assertEquals([], $state->randomizerTimestamps);
+        self::assertEquals([], $state->batchRandomizerTimestamps);
 
         // Force the destructor to run.
         unset($state);
@@ -56,7 +56,7 @@ class StateLoaderTest extends TestCase
 
         $state = $l->load();
 
-        self::assertEquals([], $state->randomizerTimestamps);
+        self::assertEquals([], $state->batchRandomizerTimestamps);
 
         // Force the destructor to run.
         unset($state);
@@ -70,14 +70,14 @@ class StateLoaderTest extends TestCase
     {
         $stateFile = vfsStream::newFile('filename.json')
             ->chmod(0644)
-            ->withContent('{"randomizerTimestamps":{"data":"1672077035"}}');
+            ->withContent('{"batchRandomizerTimestamps":{"data":"1672077035"}}');
         $stateFile->at($this->root);
 
         $l = new StateLoader($stateFile->url(), new SerdeCommon());
 
         $state = $l->load();
 
-        self::assertEquals(1672077035, $state->randomizerTimestamps['data']);
+        self::assertEquals(1672077035, $state->batchRandomizerTimestamps['data']);
 
         // Force the destructor to run.
         unset($state);
@@ -91,17 +91,17 @@ class StateLoaderTest extends TestCase
     {
         $stateFile = vfsStream::newFile('filename.json')
             ->chmod(0644)
-            ->withContent('{"randomizerTimestamps":{"data":"1672077035"}}');
+            ->withContent('{"batchRandomizerTimestamps":{"data":"1672077035"}}');
         $stateFile->at($this->root);
 
         $l = new StateLoader($stateFile->url(), new SerdeCommon());
 
         $state = $l->load();
 
-        self::assertEquals(1672077035, $state->randomizerTimestamps['data']);
+        self::assertEquals(1672077035, $state->batchRandomizerTimestamps['data']);
 
         // Add new data.
-        $state->randomizerTimestamps['new'] = 12345;
+        $state->batchRandomizerTimestamps['new'] = 12345;
 
         // Force the destructor to run.
         unset($state);
@@ -109,6 +109,6 @@ class StateLoaderTest extends TestCase
         // Verify the state file was saved out to disk.
         self::assertTrue($this->root->hasChild('filename.json'));
         $json = \json_decode(file_get_contents($stateFile->url()), true, 512, JSON_THROW_ON_ERROR);
-        self::assertEquals(12345, $json['randomizerTimestamps']['new']);
+        self::assertEquals(12345, $json['batchRandomizerTimestamps']['new']);
     }
 }

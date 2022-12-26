@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
-class RandomizerDef
+class BatchRandomizerDef
 {
     public function __construct(
         public readonly string $directory,
