@@ -57,7 +57,7 @@ class RandomizerTest extends TestCase
         $r = new Randomizer($c, $now, new SerdeCommon());
 
         $s = new State();
-        $s->randomizerTimestamps['data'] = $finished;
+        $s->randomizerTimestamps[$this->dataDir->url()] = $finished;
 
         self::assertTrue($r->previousBatchCompleted($c->randomizers[0], $s));
     }
@@ -118,6 +118,33 @@ class RandomizerTest extends TestCase
             self::assertGreaterThanOrEqual($def->minSeconds(), $seconds);
             self::assertLessThanOrEqual($def->maxSeconds(), $seconds);
         }
+    }
+
+    /** @test */
+    public function confirm_default_visibility_is_respected(): void
+    {
+        $def = new RandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
+
+        $now = new FrozenClock(new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')));
+        $c = $this->makeConfig(
+            randomizers: [$def],
+            defaultVisibility: Visibility::Private,
+        );
+
+        $r = new Randomizer($c, $now, new SerdeCommon());
+
+        /** @var Toot[] $toots */
+        $toots = iterator_to_array($r->makeToots($def));
+
+        self::assertIsArray($toots);
+        self::assertCount(6, $toots);
+
+        self::assertSame(Visibility::Private, $toots['a']->visibility);
+        self::assertSame(Visibility::Private, $toots['b']->visibility);
+        self::assertSame(Visibility::Private, $toots['c']->visibility);
+        self::assertSame(Visibility::Private, $toots['d.txt']->visibility);
+        self::assertSame(Visibility::Public, $toots['e.json']->visibility);
+        self::assertSame(Visibility::Private, $toots['f']->visibility);
     }
 
     /**

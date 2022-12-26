@@ -27,7 +27,7 @@ class TootTest extends TestCase
             'toot' => new Toot('test message'),
             'test' => function (array $params): void {
                 self::assertSame('test message', $params['status']);
-                self::assertSame('unlisted', $params['visibility']);
+                self::assertArrayNotHasKey('visibility', $params);
                 self::assertArrayNotHasKey('scheduled_at', $params);
             },
         ];

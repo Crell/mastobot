@@ -29,8 +29,9 @@ class Toot
      *   ID of the toot this post is in reply to, if any.
      * @param bool $sensitive
      *   Whether or not attached media is sensitive.
-     * @param Visibility $visibility
-     *   Defaults to "Unlisted", which is generally polite for bots.
+     * @param Visibility|null $visibility
+     *   In practice this will default to Unlisted if not specified, which is good practice for bots.
+     *   That is enforced elsewhere.
      * @param string|null $spoilerText
      *   Also known as a Content Warning. The API calls it spoiler_text, for whatever reason.
      * @param string|null $language
@@ -44,7 +45,7 @@ class Toot
         #[Field(serializedName: 'in_reply_to_id')]
         public ?string $replyTo = null,
         public bool $sensitive = false,
-        public Visibility $visibility = Visibility::Unlisted,
+        public ?Visibility $visibility = null,
         #[Field(renameWith: Cases::snake_case)]
         public ?string $spoilerText = null,
         public ?string $language = null,

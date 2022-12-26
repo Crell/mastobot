@@ -8,6 +8,7 @@ trait ConfigMaker
 {
     protected function makeConfig(...$args): Config
     {
+        // Add in junk required fields.
         $args += [
             'appName' => 'appname',
             'appInstance' => 'an.instance',

@@ -67,14 +67,16 @@ class Randomizer
         // Allow just plain text files as tweets, with no directory.
         if (!$record->isDir() && $record->getExtension() === 'txt') {
             $status = file_get_contents((string)$record);
-            return new Toot($status);
+            return new Toot($status, visibility: $this->config->defaultVisibility);
         }
 
         // Allow just JSON files as tweets, with no directory.
         if (!$record->isDir() && $record->getExtension() === 'json') {
             $status = file_get_contents((string)$record);
-            /** @var Toot */
-            return $this->serde->deserialize($status, from: 'json', to: Toot::class);
+            /** @var Toot $toot */
+            $toot = $this->serde->deserialize($status, from: 'json', to: Toot::class);
+            $toot->visibility ??= $this->config->defaultVisibility;
+            return $toot;
         }
 
         // Directory support is mostly for later, once we want to allow
@@ -86,14 +88,16 @@ class Randomizer
             $textStatus = "$record/status.txt";
             if (file_exists($textStatus)) {
                 $status = file_get_contents($textStatus);
-                return new Toot($status);
+                return new Toot($status, visibility: $this->config->defaultVisibility);
             }
 
             $jsonStatus = "$record/status.json";
             if (file_exists($jsonStatus)) {
                 $status = file_get_contents($jsonStatus);
-                /** @var Toot */
-                return $this->serde->deserialize($status, from: 'json', to: Toot::class);
+                /** @var Toot $toot */
+                $toot = $this->serde->deserialize($status, from: 'json', to: Toot::class);
+                $toot->visibility ??= $this->config->defaultVisibility;
+                return $toot;
             }
 
             // @todo Add support for attaching media.

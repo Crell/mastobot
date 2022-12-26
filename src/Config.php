@@ -41,6 +41,8 @@ class Config
 
         #[SequenceField(arrayType: RandomizerDef::class)]
         public readonly array $randomizers = [],
+
+        public readonly Visibility $defaultVisibility = Visibility::Unlisted,
     ) {}
 
     #[PostLoad]
