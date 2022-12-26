@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Mastobot;
 
 use Colorfield\Mastodon\MastodonAPI;
+use Crell\Serde\Serde;
 use Psr\Clock\ClockInterface;
 
 class Runner
@@ -14,6 +15,7 @@ class Runner
         private readonly Config $config,
         private readonly Randomizer $randomizer,
         private readonly ClockInterface $clock,
+        private readonly Serde $serde,
     ) {}
 
     public function run(State $state): void
@@ -26,7 +28,8 @@ class Runner
         foreach ($this->config->randomizers as $def) {
             if ($this->randomizer->previousBatchCompleted($def, $state)) {
                 foreach ($this->randomizer->makeToots($def) as $toot) {
-                    $reply = $this->api->post('/statuses', $toot->asParams());
+                    $params = $this->serde->serialize($toot, 'array');
+                    $reply = $this->api->post('/statuses', $params);
                 }
             }
             $state->randomizerTimestamps[$def->directory] = $this->clock->now()->format('U');

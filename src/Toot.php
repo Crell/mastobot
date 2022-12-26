@@ -20,6 +20,10 @@ use Crell\Serde\Renaming\Cases;
 class Toot
 {
     /**
+     * Note that the order of arguments is *not* guaranteed, except that "status" comes first.
+     *
+     * Use named arguments with this constructor.
+     *
      * @param string $status
      * @param string|null $replyTo
      *   ID of the toot this post is in reply to, if any.
@@ -27,7 +31,7 @@ class Toot
      *   Whether or not attached media is sensitive.
      * @param Visibility $visibility
      *   Defaults to "Unlisted", which is generally polite for bots.
-     * @param string|null $spoiler_text
+     * @param string|null $spoilerText
      *   Also known as a Content Warning. The API calls it spoiler_text, for whatever reason.
      * @param string|null $language
      *   ISO 639 language code for this status.
@@ -41,35 +45,10 @@ class Toot
         public ?string $replyTo = null,
         public bool $sensitive = false,
         public Visibility $visibility = Visibility::Unlisted,
-        public ?string $spoiler_text = null,
+        #[Field(renameWith: Cases::snake_case)]
+        public ?string $spoilerText = null,
         public ?string $language = null,
         #[Field(renameWith: Cases::snake_case)]
         public ?\DateTimeImmutable $scheduledAt = null,
     ) {}
-
-    /**
-     *
-     *
-     * @return array<string, mixed>
-     */
-    public function asParams(): array
-    {
-        $ret = [];
-        $ret['visibility'] = $this->visibility->value;
-
-        if (!is_null($this->replyTo)) {
-            $ret['in_reply_to_id'] = $this->replyTo;
-        }
-
-        if (!is_null($this->scheduledAt)) {
-            $ret['scheduled_at'] = $this->scheduledAt->format('c');
-        }
-
-        foreach (['status', 'sensitive', 'spoiler_text', 'language'] as $key) {
-            if (!is_null($this->$key)) {
-                $ret[$key] = $this->$key;
-            }
-        }
-        return $ret;
-    }
 }

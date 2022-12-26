@@ -6,6 +6,7 @@ namespace Crell\Mastobot;
 
 use Colorfield\Mastodon\ConfigurationVO;
 use Colorfield\Mastodon\MastodonAPI;
+use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 
@@ -27,7 +28,7 @@ class RunnerTest extends TestCase
 
         $clock = new FrozenClock(new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')));
 
-        $r = new Runner($api, $config, $randomizer, $clock);
+        $r = new Runner($api, $config, $randomizer, $clock, new SerdeCommon());
 
         $r->run(new State());
 

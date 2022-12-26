@@ -105,7 +105,7 @@ class RandomizerTest extends TestCase
         self::assertSame(Visibility::Public, $toots['e.json']->visibility);
         self::assertSame(Visibility::Unlisted, $toots['f']->visibility);
 
-        self::assertSame('spoiler', $toots['f']->spoiler_text);
+        self::assertSame('spoiler', $toots['f']->spoilerText);
 
         // Pair each message with the one right after it.
         $pairs = array_map(null, $toots, [null, ...$toots]);
