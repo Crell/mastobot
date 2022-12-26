@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
-use Colorfield\Mastodon\ConfigurationVO;
 use Colorfield\Mastodon\MastodonAPI;
 use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
-use Psr\Clock\ClockInterface;
 
 class RunnerTest extends TestCase
 {
