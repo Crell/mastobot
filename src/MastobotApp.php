@@ -45,7 +45,7 @@ class MastobotApp extends Container
             => new Randomizer($c[Config::class], $c[ClockInterface::class]);
 
         $this[StateLoader::class] = static fn (Container $c)
-            => new StateLoader($c[Config::class], $c[Serde::class]);
+            => new StateLoader($c[Config::class]->stateFile, $c[Serde::class]);
 
         $this[Runner::class] = static fn (Container $c)
             => new Runner($c[MastodonAPI::class], $c[Config::class], $c[Randomizer::class], $c[ClockInterface::class]);
