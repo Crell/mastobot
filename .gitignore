@@ -3,3 +3,4 @@ vendor
 .phpunit.result.cache
 build
 mastobot.json
+mastobot_state.json
