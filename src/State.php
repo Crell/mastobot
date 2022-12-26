@@ -6,6 +6,7 @@ namespace Crell\Mastobot;
 
 use Crell\Serde\Attributes\DictionaryField;
 use Crell\Serde\Attributes\Field;
+use Crell\Serde\KeyType;
 use Crell\Serde\Serde;
 
 class State
@@ -14,7 +15,7 @@ class State
      * @var array<string, int>
      *     Path of the directory to the unix timestamp of when the last batch will complete.
      */
-    #[DictionaryField]
+    #[DictionaryField(arrayType: 'int', keyType: KeyType::String)]
     public array $randomizerTimestamps = [];
 
     #[Field(exclude: true)]

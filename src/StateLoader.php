@@ -30,7 +30,7 @@ class StateLoader
 
     public function save(State $state): void
     {
-        $serialized = $this->serde->serialize($this, format: 'json');
+        $serialized = $this->serde->serialize($state, format: 'json');
         file_put_contents($this->stateFile, $serialized);
     }
 }

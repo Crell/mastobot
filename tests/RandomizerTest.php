@@ -12,7 +12,9 @@ class RandomizerTest extends TestCase
 {
     private vfsStreamDirectory $root;
 
-    public function setUp(): void {
+    public function setUp(): void
+    {
+        parent::setUp();
         $this->root = vfsStream::setup();
 
         //$this->configFile = vfsStream::newFile(Config::ConfigFileName);
