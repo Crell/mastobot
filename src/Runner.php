@@ -25,12 +25,8 @@ class Runner
     {
         foreach ($this->config->randomizers as $def) {
             if ($this->randomizer->previousBatchCompleted($def, $state)) {
-                foreach ($this->randomizer->makeToots($def, $state) as $toot) {
-                    //var_dump($toot);
-                    $params = $toot->asParams();
-                    //var_dump($params);
-                    //$reply = $this->api->post('/statuses', $params);
-                    //var_dump($reply);
+                foreach ($this->randomizer->makeToots($def) as $toot) {
+                    $reply = $this->api->post('/statuses', $toot->asParams());
                 }
             }
             $state->randomizerTimestamps[$def->directory] = $this->clock->now()->format('U');

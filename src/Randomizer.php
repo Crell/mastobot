@@ -37,10 +37,9 @@ class Randomizer
      * anywhere from 6 to 16 hours to get through the whole cycle.
      *
      * @param RandomizerDef $def
-     * @param State $state
      * @return iterable<Toot>
      */
-    public function makeToots(RandomizerDef $def, State $state): iterable
+    public function makeToots(RandomizerDef $def): \Generator
     {
         /** @var \SplFileInfo[] $postDirs */
         $postDirs = iterator_to_array(new \FilesystemIterator($def->directory,\FilesystemIterator::SKIP_DOTS));

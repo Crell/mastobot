@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class RandomizerTest extends TestCase
 {
+    use ConfigMaker;
+
     private vfsStreamDirectory $root;
 
     public function setUp(): void
@@ -73,7 +75,7 @@ class RandomizerTest extends TestCase
     }
 
     /** @test */
-    public function stuff(): void
+    public function validate_randomizer(): void
     {
         $def = new RandomizerDef(directory: 'data', minHours: 1, maxHours: 5);
 
@@ -87,7 +89,7 @@ class RandomizerTest extends TestCase
         $s = new State();
 
         /** @var Toot[] $toots */
-        $toots = iterator_to_array($r->makeToots($def, $s));
+        $toots = iterator_to_array($r->makeToots($def));
 
         self::assertIsArray($toots);
         self::assertCount(3, $toots);
@@ -125,16 +127,5 @@ class RandomizerTest extends TestCase
             * ($interval->invert ? -1 : 1 );
     }
 
-    protected function makeConfig(...$args): Config
-    {
-        $args += [
-            'appName' => 'appname',
-            'appInstance' => 'an.instance',
-            'clientId' => 'abc',
-            'clientSecret' => 'def',
-            'bearerToken' => 'ghi',
-        ];
 
-        return new Config(...$args);
-    }
 }
