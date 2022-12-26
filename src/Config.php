@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Mastobot;
 use Crell\Serde\Attributes\Field;
 use Crell\Serde\Attributes\PostLoad;
+use Crell\Serde\Attributes\SequenceField;
 use Crell\Serde\Renaming\Cases;
 
 class Config
@@ -24,9 +25,20 @@ class Config
     #[Field(serializedName: 'token')]
     public readonly string $bearerToken;
 
+    public readonly string $stateFile;
+
+    /**
+     * @var RandomizerDef[]
+     */
+    #[SequenceField(arrayType: RandomizerDef::class)]
+    public readonly array $randomizers;
+
     #[PostLoad]
     private function validate(): void
     {
+        // @todo I'm not sure why setting this with a default in a Field attribute isn't working.
+        $this->stateFile ??= 'mastobot_state.json';
+
         match(true) {
             empty($this->appName) => throw new \InvalidArgumentException('The app.name must be specified in mastobot.json.'),
             empty($this->appInstance) => throw new \InvalidArgumentException('The app.instance must be specified in mastobot.json.'),
