@@ -38,6 +38,7 @@ class Randomizer
      *
      * @param RandomizerDef $def
      * @param State $state
+     * @return iterable<Toot>
      */
     public function makeToots(RandomizerDef $def, State $state): iterable
     {
@@ -88,6 +89,9 @@ class Randomizer
         */
 
         // @todo Add support for attaching media.
+
+        // If no toot could be loaded from here.
+        return null;
     }
 
     protected function getRandomizedGap(RandomizerDef $def): \DateInterval

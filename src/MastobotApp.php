@@ -23,7 +23,7 @@ class MastobotApp extends Container
             /** @var Serde $serde */
             $serde = $c[Serde::class];
 
-            return $serde->deserialize(file_get_contents('mastobot.json'), from: 'json', to: Config::class);
+            return $serde->deserialize(file_get_contents(Config::ConfigFileName), from: 'json', to: Config::class);
         };
 
         $this[MastodonOAuth::class] = static function (Container $c) {
@@ -39,24 +39,15 @@ class MastobotApp extends Container
         $this[MastodonAPI::class] = static fn (Container $c)
             => new MastodonAPI($c[MastodonOAuth::class]->config);
 
-        $this[State::class] = static function (Container $c) {
-            /** @var Serde $serde */
-            $serde = $c[Serde::class];
-
-            /** @var Config $config */
-            $config = $c[Config::class];
-
-            if (file_exists($config->stateFile)) {
-                $state = file_get_contents($config->stateFile);
-                return $serde->deserialize($state, from: 'json', to: State::class);
-            }
-
-            return new State();
-        };
-
         $this[ClockInterface::class] = static fn(Container $c) => new UtcClock();
 
         $this[Randomizer::class] = static fn (Container $c)
             => new Randomizer($c[Config::class], $c[ClockInterface::class]);
+
+        $this[StateLoader::class] = static fn (Container $c)
+            => new StateLoader($c[Config::class], $c[Serde::class]);
+
+        $this[Runner::class] = static fn (Container $c)
+            => new Runner($c[MastodonAPI::class], $c[Config::class], $c[Randomizer::class], $c[ClockInterface::class]);
     }
 }

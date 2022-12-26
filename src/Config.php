@@ -10,6 +10,8 @@ use Crell\Serde\Renaming\Cases;
 
 class Config
 {
+    public const ConfigFileName = 'mastobot.json';
+
     #[Field(serializedName: 'app.name')]
     public readonly string $appName;
 

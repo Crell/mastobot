@@ -42,6 +42,11 @@ class Toot
         public ?\DateTimeImmutable $scheduledAt = null,
     ) {}
 
+    /**
+     *
+     *
+     * @return array<string, mixed>
+     */
     public function asParams(): array
     {
         $ret = [];
