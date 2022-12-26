@@ -44,14 +44,9 @@ class Randomizer
     {
         /** @var \SplFileInfo[] $postDirs */
         $postDirs = iterator_to_array(new \FilesystemIterator($def->directory,\FilesystemIterator::SKIP_DOTS));
-
         shuffle($postDirs);
 
         $now = $this->clock->now();
-
-        // @todo For testing, ensure at least a 5 min starting gap to keep the API happy.
-        $now = $now->add(new \DateInterval('PT5M'));
-
         $postTime = $now->add($this->getRandomizedGap($def));
 
         foreach ($postDirs as $dir) {
@@ -75,8 +70,7 @@ class Randomizer
 
         if (file_exists($textStatus)) {
             $status = file_get_contents($textStatus);
-            // @todo Direct only visibility for now, for testing.
-            return new Toot($status, visibility: Visibility::Direct);
+            return new Toot($status);
         }
 
         // @todo Make this actually work, using Serde.
@@ -96,14 +90,7 @@ class Randomizer
 
     protected function getRandomizedGap(RandomizerDef $def): \DateInterval
     {
-        //$minSeconds = $def->minTime * 60 * 60;
-        //$maxSeconds = $def->maxTime * 60 * 60;
-
-        // @todo For testing, use minutes instead of hours.  CHANGE BEFORE RELEASE!
-        $minSeconds = $def->minTime * 60;
-        $maxSeconds = $def->maxTime * 60;
-
-        $gapSeconds = \random_int($minSeconds, $maxSeconds);
+        $gapSeconds = \random_int($def->minSeconds(), $def->maxSeconds());
 
         return new \DateInterval("PT{$gapSeconds}S");
     }

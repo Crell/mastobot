@@ -11,7 +11,8 @@
         "phpunit/phpunit": "^9.5",
         "phpbench/phpbench": "^1.1",
         "phpstan/phpstan": "^1.0",
-        "vishnubob/wait-for-it": "dev-master"
+        "vishnubob/wait-for-it": "dev-master",
+        "mikey179/vfsstream": "2.0.x-dev"
     },
     "autoload": {
         "psr-4": {

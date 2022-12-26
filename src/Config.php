@@ -12,28 +12,36 @@ class Config
 {
     public const ConfigFileName = 'mastobot.json';
 
-    #[Field(serializedName: 'app.name')]
-    public readonly string $appName;
-
-    #[Field(serializedName: 'app.instance')]
-    public readonly string $appInstance;
-
-    #[Field(renameWith: Cases::snake_case)]
-    public readonly string $clientId;
-
-    #[Field(renameWith: Cases::snake_case)]
-    public readonly string $clientSecret;
-
-    #[Field(serializedName: 'token')]
-    public readonly string $bearerToken;
-
-    public readonly string $stateFile;
-
     /**
-     * @var RandomizerDef[]
+     * @param string $appName
+     * @param string $appInstance
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param string $bearerToken
+     * @param string $stateFile
+     * @param RandomizerDef[] $randomizers
      */
-    #[SequenceField(arrayType: RandomizerDef::class)]
-    public readonly array $randomizers;
+    public function __construct(
+        #[Field(serializedName: 'app.name')]
+        public readonly string $appName,
+
+        #[Field(serializedName: 'app.instance')]
+        public readonly string $appInstance,
+
+        #[Field(renameWith: Cases::snake_case)]
+        public readonly string $clientId,
+
+        #[Field(renameWith: Cases::snake_case)]
+        public readonly string $clientSecret,
+
+        #[Field(serializedName: 'token')]
+        public readonly string $bearerToken,
+
+        public readonly ?string $stateFile = null,
+
+        #[SequenceField(arrayType: RandomizerDef::class)]
+        public readonly array $randomizers = [],
+    ) {}
 
     #[PostLoad]
     private function validate(): void

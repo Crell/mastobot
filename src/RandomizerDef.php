@@ -8,9 +8,17 @@ class RandomizerDef
 {
     public function __construct(
         public readonly string $directory,
-        public readonly int $minTime,
-        public readonly int $maxTime,
+        public readonly int $minHours,
+        public readonly int $maxHours,
     ) {}
 
+    public function minSeconds(): int
+    {
+        return $this->minHours * 60 * 60;
+    }
 
+    public function maxSeconds(): int
+    {
+        return $this->maxHours * 60 * 60;
+    }
 }
