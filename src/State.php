@@ -12,26 +12,14 @@ use Crell\Serde\Serde;
 class State
 {
     /**
-     * @var array<string, int>
-     *     Path of the directory to the unix timestamp of when the last batch will complete.
+     * @var array<string, PosterState>
+     *     Array of directory names to the poster state for that directory.
      */
-    #[DictionaryField(arrayType: 'int', keyType: KeyType::String)]
-    public array $batchRandomizerTimestamps = [];
+    #[DictionaryField(arrayType: PosterState::class, keyType: KeyType::String)]
+    public array $posters = [];
 
     #[Field(exclude: true)]
     private StateLoader $loader;
-
-    /**
-     *
-     * @internal
-     *
-     * @param string $filename
-     */
-    public function setSaveFile(string $filename, Serde $serde): void
-    {
-        $this->filename = $filename;
-        $this->serde = $serde;
-    }
 
     public function setLoader(StateLoader $loader): void
     {

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
-use Colorfield\Mastodon\MastodonAPI;
-
 require 'vendor/autoload.php';
 
 $app = new MastobotApp();

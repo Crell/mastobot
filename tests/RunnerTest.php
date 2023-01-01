@@ -5,8 +5,15 @@ declare(strict_types=1);
 namespace Crell\Mastobot;
 
 use Colorfield\Mastodon\MastodonAPI;
+use Crell\Mastobot\Clock\FrozenClock;
+use Crell\Mastobot\Sequence\Sequence;
+use Crell\Mastobot\Sequence\SequenceDef;
+use Crell\Mastobot\Status\Status;
+use Crell\Mastobot\Status\StatusRepoFactory;
+use Crell\Mastobot\Status\StatusRepository;
 use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
+use Pimple\Container;
 
 class RunnerTest extends TestCase
 {
@@ -17,20 +24,38 @@ class RunnerTest extends TestCase
     {
         $api = $this->mockMastodonAPI();
 
-        $def = new BatchRandomizerDef(directory: 'data', minHours: 1, maxHours: 5);
+        $def = new SequenceDef(directory: 'data', minHours: 1, maxHours: 5);
         $config = $this->makeConfig(
-            batchRandomizers: [$def],
+            posters: [$def],
         );
-
-       $randomizer = $this->mockRandomizer(3, true);
 
         $clock = new FrozenClock(new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')));
 
-        $r = new Runner($api, $config, $randomizer, $clock, new SerdeCommon());
+        $mockRepo = new MockStatusRepo([
+            'a.txt' => new Status('A'),
+            'b.txt' => new Status('B'),
+            'c.txt' => new Status('C'),
+        ]);
+
+        $repoFactory = new class($mockRepo) extends StatusRepoFactory {
+            public function __construct(public StatusRepository $repo) {}
+
+            public function getRepository(PosterDef $def): StatusRepository
+            {
+                return $this->repo;
+            }
+        };
+
+        $container = new Container();
+        $container[Sequence::class] = new Sequence($clock, $repoFactory);
+
+        $r = new Runner($container, $api, $config, new SerdeCommon());
 
         $r->run(new State());
 
-        self::assertEquals(3, $api->postCount);
+        // postCount is on our mock, but it's an anon class so we cannot type for it.
+        // @phpstan-ignore-next-line
+        self::assertEquals(1, $api->postCount);
     }
 
     protected function mockMastodonAPI(): MastodonAPI
@@ -40,30 +65,9 @@ class RunnerTest extends TestCase
 
             public function __construct() {}
 
-            public function post($endpoint, array $params = [])
+            public function post(mixed $endpoint, array $params = []): void
             {
                 $this->postCount++;
-            }
-        };
-    }
-
-    protected function mockRandomizer(int $numToots, bool $prevCompleted): BatchRandomizer
-    {
-        return new class($numToots, $prevCompleted) extends BatchRandomizer {
-            public function __construct(public int $numToots, public bool $prevCompleted) {}
-
-            public function previousBatchCompleted(BatchRandomizerDef $def, State $state): bool
-            {
-                return $this->prevCompleted;
-            }
-
-            public function makeToots(BatchRandomizerDef $def): \Generator
-            {
-                static $callCount = 1;
-                for ($i = 0; $i < $this->numToots; ++$i) {
-                    yield new Toot("Call " . $callCount++);
-                }
-
             }
         };
     }

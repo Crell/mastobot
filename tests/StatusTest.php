@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
+use Crell\Mastobot\Status\Status;
 use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
 
-class TootTest extends TestCase
+class StatusTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider example_toots()
+     * @dataProvider example_statuses()
      */
-    public function params_generate_correctly(Toot $toot, callable $test): void
+    public function params_generate_correctly(Status $toot, callable $test): void
     {
         $serde = new SerdeCommon();
 
@@ -21,10 +22,10 @@ class TootTest extends TestCase
         $test($array);
     }
 
-    public function example_toots(): iterable
+    public function example_statuses(): iterable
     {
         yield [
-            'toot' => new Toot('test message'),
+            'toot' => new Status('test message'),
             'test' => function (array $params): void {
                 self::assertSame('test message', $params['status']);
                 self::assertArrayNotHasKey('visibility', $params);
@@ -32,7 +33,7 @@ class TootTest extends TestCase
             },
         ];
         yield [
-            'toot' => new Toot('test message', visibility: Visibility::Private, spoilerText: 'spoiler'),
+            'toot' => new Status('test message', visibility: Visibility::Private, spoilerText: 'spoiler'),
             'test' => function (array $params): void {
                 self::assertSame('test message', $params['status']);
                 self::assertSame('private', $params['visibility']);
@@ -41,7 +42,7 @@ class TootTest extends TestCase
             },
         ];
         yield [
-            'toot' => new Toot('test message', scheduledAt: new \DateTimeImmutable('2030-07-04 12:00:00', new \DateTimeZone('UTC'))),
+            'toot' => new Status('test message', scheduledAt: new \DateTimeImmutable('2030-07-04 12:00:00', new \DateTimeZone('UTC'))),
             'test' => function (array $params): void {
                 self::assertSame('test message', $params['status']);
                 self::assertArrayNotHasKey('spoiler_text', $params);

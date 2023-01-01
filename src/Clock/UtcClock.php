@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\Mastobot;
+namespace Crell\Mastobot\Clock;
 
 use DateTimeImmutable;
 use Psr\Clock\ClockInterface;

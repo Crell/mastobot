@@ -6,6 +6,10 @@ namespace Crell\Mastobot;
 
 use Colorfield\Mastodon\MastodonAPI;
 use Colorfield\Mastodon\MastodonOAuth;
+use Crell\Mastobot\Clock\UtcClock;
+use Crell\Mastobot\Sequence\Sequence;
+use Crell\Mastobot\SingleRandomizer\SingleRandomizer;
+use Crell\Mastobot\Status\StatusRepoFactory;
 use Crell\Serde\Serde;
 use Crell\Serde\SerdeCommon;
 use Pimple\Container;
@@ -13,6 +17,9 @@ use Psr\Clock\ClockInterface;
 
 class MastobotApp extends Container
 {
+    /**
+     * @param array<string, mixed> $values
+     */
     public function __construct(array $values = [])
     {
         parent::__construct($values);
@@ -41,18 +48,23 @@ class MastobotApp extends Container
 
         $this[ClockInterface::class] = static fn(Container $c) => new UtcClock();
 
-        $this[BatchRandomizer::class] = static fn (Container $c)
-            => new BatchRandomizer($c[Config::class], $c[ClockInterface::class], $c[Serde::class]);
-
         $this[StateLoader::class] = static fn (Container $c)
             => new StateLoader($c[Config::class]->stateFile, $c[Serde::class]);
 
+        $this[StatusRepoFactory::class] = static fn (Container $c)
+            => new StatusRepoFactory($c[Serde::class], $c[Config::class]);
+
+        $this[SingleRandomizer::class] = static fn (Container $c)
+            => new SingleRandomizer($c[ClockInterface::class], $c[StatusRepoFactory::class]);
+
+        $this[Sequence::class] = static fn (Container $c)
+            => new Sequence($c[ClockInterface::class], $c[StatusRepoFactory::class]);
+
         $this[Runner::class] = static fn (Container $c)
             => new Runner(
+                app: $c,
                 api: $c[MastodonAPI::class],
                 config: $c[Config::class],
-                randomizer: $c[BatchRandomizer::class],
-                clock: $c[ClockInterface::class],
                 serde: $c[Serde::class],
             );
     }

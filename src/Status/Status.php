@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Crell\Mastobot;
+namespace Crell\Mastobot\Status;
 
 
+use Crell\Mastobot\Visibility;
 use Crell\Serde\Attributes\Field;
 use Crell\Serde\Renaming\Cases;
 
 /**
- * Value Object of a Toot.
+ * Value Object of a Status.
  *
  * Always use the constructor with named arguments, as the order of parameters is not guaranteed.
  *
  * @todo Add Media
  * @todo Add Polls
- * @todo Add Scheduling
  */
-class Toot
+class Status
 {
     /**
      * Note that the order of arguments is *not* guaranteed, except that "status" comes first.

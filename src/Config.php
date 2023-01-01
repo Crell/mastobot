@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Crell\Mastobot;
+use Crell\Serde\Attributes\DictionaryField;
 use Crell\Serde\Attributes\Field;
 use Crell\Serde\Attributes\PostLoad;
 use Crell\Serde\Attributes\SequenceField;
@@ -18,8 +19,9 @@ class Config
      * @param string $clientId
      * @param string $clientSecret
      * @param string $bearerToken
-     * @param string $stateFile
-     * @param BatchRandomizerDef[] $batchRandomizers
+     * @param ?string $stateFile
+     * @param array<string, mixed> $defaults
+     * @param PosterDef[] $posters
      */
     public function __construct(
         #[Field(serializedName: 'app.name')]
@@ -39,11 +41,11 @@ class Config
 
         public readonly ?string $stateFile = null,
 
-        public readonly Visibility $defaultVisibility = Visibility::Unlisted,
+        #[DictionaryField]
+        public readonly array $defaults = ['visibility' => Visibility::Unlisted],
 
-        #[SequenceField(arrayType: BatchRandomizerDef::class)]
-        #[Field(renameWith: Cases::snake_case)]
-        public readonly array $batchRandomizers = [],
+        #[SequenceField(arrayType: PosterDef::class)]
+        public readonly array $posters = [],
     ) {}
 
     #[PostLoad]

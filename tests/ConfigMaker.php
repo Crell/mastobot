@@ -6,7 +6,7 @@ namespace Crell\Mastobot;
 
 trait ConfigMaker
 {
-    protected function makeConfig(...$args): Config
+    protected function makeConfig(mixed ...$args): Config
     {
         // Add in junk required fields.
         $args += [

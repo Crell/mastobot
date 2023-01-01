@@ -35,7 +35,7 @@ class StateLoaderTest extends TestCase
 
         $state = $l->load();
 
-        self::assertEquals([], $state->batchRandomizerTimestamps);
+        self::assertEquals([], $state->posters);
 
         // Force the destructor to run.
         unset($state);
@@ -47,16 +47,16 @@ class StateLoaderTest extends TestCase
     /** @test */
     public function empty_state_file_returns_existing_state(): void
     {
-        $stateFile = vfsStream::newFile('filename.json')
-            ->chmod(0644)
-            ->withContent('{}');
+        $stateFile = vfsStream::newFile('filename.json');
+        $stateFile->chmod(0644);
+        $stateFile->withContent('{}');
         $stateFile->at($this->root);
 
         $l = new StateLoader($stateFile->url(), new SerdeCommon());
 
         $state = $l->load();
 
-        self::assertEquals([], $state->batchRandomizerTimestamps);
+        self::assertEquals([], $state->posters);
 
         // Force the destructor to run.
         unset($state);
@@ -68,16 +68,18 @@ class StateLoaderTest extends TestCase
     /** @test */
     public function populated_state_file_returns_existing_state(): void
     {
-        $stateFile = vfsStream::newFile('filename.json')
-            ->chmod(0644)
-            ->withContent('{"batchRandomizerTimestamps":{"data":"1672077035"}}');
+        $stateFile = vfsStream::newFile('filename.json');
+        $stateFile->chmod(0644);
+        $stateFile->withContent('{"posters": {"data": {"strategy": "sequence", "nextPostTime": "2022-12-25 12:00:00", "lastStatus": "a.txt" }}}');
         $stateFile->at($this->root);
 
         $l = new StateLoader($stateFile->url(), new SerdeCommon());
 
         $state = $l->load();
 
-        self::assertEquals(1672077035, $state->batchRandomizerTimestamps['data']);
+        // PHPStan doesn't know that the posters list is a SequenceState, but we do.
+        // @phpstan-ignore-next-line
+        self::assertEquals('a.txt', $state->posters['data']->lastStatus);
 
         // Force the destructor to run.
         unset($state);
@@ -89,19 +91,22 @@ class StateLoaderTest extends TestCase
     /** @test */
     public function updated_state_object_writes_new_data_to_disk(): void
     {
-        $stateFile = vfsStream::newFile('filename.json')
-            ->chmod(0644)
-            ->withContent('{"batchRandomizerTimestamps":{"data":"1672077035"}}');
+        $stateFile = vfsStream::newFile('filename.json');
+        $stateFile->chmod(0644);
+        $stateFile->withContent('{"posters": {"data": {"strategy": "sequence", "nextPostTime": "2022-12-25 12:00:00", "lastStatus": "a.txt" }}}');
         $stateFile->at($this->root);
 
         $l = new StateLoader($stateFile->url(), new SerdeCommon());
 
         $state = $l->load();
 
-        self::assertEquals(1672077035, $state->batchRandomizerTimestamps['data']);
+        // PHPStan doesn't know that the posters list is a SequenceState, but we do.
+        // @phpstan-ignore-next-line
+        self::assertEquals('a.txt', $state->posters['data']->lastStatus);
 
-        // Add new data.
-        $state->batchRandomizerTimestamps['new'] = 12345;
+        // Change data.
+        // @phpstan-ignore-next-line
+        $state->posters['data']->lastStatus = 'b.txt';
 
         // Force the destructor to run.
         unset($state);
@@ -109,6 +114,6 @@ class StateLoaderTest extends TestCase
         // Verify the state file was saved out to disk.
         self::assertTrue($this->root->hasChild('filename.json'));
         $json = \json_decode(file_get_contents($stateFile->url()), true, 512, JSON_THROW_ON_ERROR);
-        self::assertEquals(12345, $json['batchRandomizerTimestamps']['new']);
+        self::assertEquals('b.txt', $json['posters']['data']['lastStatus']);
     }
 }
