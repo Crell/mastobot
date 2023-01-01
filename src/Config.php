@@ -24,10 +24,10 @@ class Config
      * @param PosterDef[] $posters
      */
     public function __construct(
-        #[Field(serializedName: 'app.name')]
+        #[Field(serializedName: 'app_name')]
         public readonly string $appName,
 
-        #[Field(serializedName: 'app.instance')]
+        #[Field(serializedName: 'app_instance')]
         public readonly string $appInstance,
 
         #[Field(renameWith: Cases::snake_case)]
