@@ -1,5 +1,6 @@
 {
     "name": "crell/mastobot",
+    "license": "AGPL-3.0-or-later",
     "require": {
         "php": "~8.1",
         "colorfield/mastodon-api": "dev-master",
