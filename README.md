@@ -126,6 +126,12 @@ This support is mostly for future support for attaching media.  That doesn't wor
 
 A directory may contain either a `status.txt` or `status.json` file, which will be read the same as a stand-alone file.  (In the future, image files in the directory will automatically be attached to the post.)
 
+## Why not use scheduled posts?
+
+The ActivityPub and Mastodon API supports scheduled posts.  However, most Mastodon UIs do not include a way to review, modify, or cancel modified posts.  While it would be possible, and perhaps more efficient, for Mastobot to just push all posts at once with a scheduled time, that would allow no way to modify or clean up scheduled posts without building a complete UI for it as part of Mastobot.
+
+That's out of scope for now, so instead it just posts normally.  However, you may use the `scheduled_at` property in a JSON post to cause the post to be scheduled instead of published immediately.
+
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) and [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) for details.
