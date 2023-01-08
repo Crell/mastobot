@@ -39,6 +39,7 @@ class Config
         #[Field(serializedName: 'token')]
         public readonly string $bearerToken,
 
+        #[Field(serializedName: 'status_file')]
         public readonly ?string $stateFile = null,
 
         #[DictionaryField]
