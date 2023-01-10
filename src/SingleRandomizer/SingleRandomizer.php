@@ -23,7 +23,7 @@ class SingleRandomizer implements PostStrategy
     public function getStatuses(PosterDef $def, State $state): array
     {
         /** @var SingleRandomizerState $posterState */
-        $posterState = $state->posters[$def->directory()];
+        $posterState = $state->posters[$def->directory()] ?? new SingleRandomizerState();
 
         $now = $this->clock->now();
         $nextPostTime = $posterState->nextPostTime ?? $now;
@@ -36,6 +36,7 @@ class SingleRandomizer implements PostStrategy
         $status = $repo->getRandom();
 
         $posterState->nextPostTime = $now->add($def->getRandomizedGap());
+        $state->posters[$def->directory()] = $posterState;
 
         return [$status];
     }
