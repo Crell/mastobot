@@ -40,7 +40,7 @@ class Config
         public readonly string $bearerToken,
 
         #[Field(serializedName: 'status_file')]
-        public readonly ?string $stateFile = null,
+        public readonly ?string $stateFile = 'mastobot_state.json',
 
         #[DictionaryField]
         public readonly array $defaults = ['visibility' => Visibility::Unlisted],
@@ -52,9 +52,6 @@ class Config
     #[PostLoad]
     private function validate(): void
     {
-        // @todo I'm not sure why setting this with a default in a Field attribute isn't working.
-        $this->stateFile ??= 'mastobot_state.json';
-
         match(true) {
             empty($this->appName) => throw new \InvalidArgumentException('The app.name must be specified in mastobot.json.'),
             empty($this->appInstance) => throw new \InvalidArgumentException('The app.instance must be specified in mastobot.json.'),
