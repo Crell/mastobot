@@ -108,6 +108,13 @@ class SequenceTest extends TestCase
             'expectedStatus' => 'B',
             'expectedLastStatus' => 'b.txt',
         ];
+        yield 'if we are exactly at the next post time, return the next status' => [
+            // Next post is an hour in the past.
+            'nextPostTime' =>  new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')),
+            'lastStatus' => 'a.txt',
+            'expectedStatus' => 'B',
+            'expectedLastStatus' => 'b.txt',
+        ];
         yield 'if we have not reached the next post time, do nothing' => [
             // Next post is a day in the future.
             'nextPostTime' =>  new \DateTimeImmutable('2022-12-26 12:00', new \DateTimeZone('UTC')),

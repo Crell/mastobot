@@ -28,7 +28,7 @@ class SingleRandomizer implements PostStrategy
         $now = $this->clock->now();
         $nextPostTime = $posterState->nextPostTime ?? $now;
 
-        if ($now <= $nextPostTime) {
+        if ($now < $nextPostTime) {
             return [];
         }
 

@@ -29,7 +29,7 @@ class Sequence implements PostStrategy
         $nextPostTime = $posterState->nextPostTime ?? null;
 
         // Bail early if it's not time to post anything yet.
-        if ($nextPostTime && $now <= $nextPostTime) {
+        if ($nextPostTime && $now < $nextPostTime) {
             return [];
         }
 

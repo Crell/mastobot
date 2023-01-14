@@ -85,5 +85,9 @@ class SingleRandomizerTest extends TestCase
             'nextPostTime' =>  new \DateTimeImmutable('2022-12-26 12:00', new \DateTimeZone('UTC')),
             'expectEmpty' => true,
         ];
+        yield 'if we are exactly at the next post time, return the next status' => [
+            // Next post is a day in the future.
+            'nextPostTime' =>  new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')),
+        ];
     }
 }
