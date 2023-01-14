@@ -6,14 +6,19 @@ namespace Crell\Mastobot;
 
 require 'vendor/autoload.php';
 
-$app = new MastobotApp();
+try {
+    $app = new MastobotApp();
 
-/** @var Runner $runner */
-$runner = $app[Runner::class];
+    /** @var Runner $runner */
+    $runner = $app[Runner::class];
 
-/** @var StateLoader $loader */
-$loader = $app[StateLoader::class];
+    /** @var StateLoader $loader */
+    $loader = $app[StateLoader::class];
 
-$state = $loader->load();
+    $state = $loader->load();
 
-$runner->run($state);
+    $runner->run($state);
+} catch (ErrorMessage $e) {
+    print $e->getMessage() . PHP_EOL;
+    exit(1);
+}

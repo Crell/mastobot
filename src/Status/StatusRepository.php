@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot\Status;
 
+use Crell\Mastobot\InvalidVisibility;
+use Crell\Mastobot\Visibility;
 use Crell\Serde\Serde;
 
 class StatusRepository
@@ -14,8 +16,16 @@ class StatusRepository
     public function __construct(
         protected readonly Serde $serde,
         protected readonly string $directory,
-        protected readonly array $defaults,
-    ) {}
+        protected array $defaults,
+    ) {
+        if (isset($this->defaults['visibility']) && is_string($this->defaults['visibility'])) {
+            $visibility = Visibility::tryFrom($this->defaults['visibility']);
+            if (!$visibility) {
+                throw InvalidVisibility::create($this->defaults['visibility']);
+            }
+            $this->defaults['visibility'] = $visibility;
+        }
+    }
 
     public function getRandom(): Status
     {

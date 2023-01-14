@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Mastobot\Status;
 
 use Crell\Mastobot\FakeFilesystem;
+use Crell\Mastobot\InvalidVisibility;
 use Crell\Mastobot\Visibility;
 use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +31,14 @@ class StatusRepositoryTest extends TestCase
         self::assertEquals($expectedList, $names);
     }
 
+    /** @test */
+    public function invalid_visibility_throws_exception(): void
+    {
+        $this->expectException(InvalidVisibility::class);
+        $this->expectExceptionMessage('The configuration file specified a visibility of "everyone".  The only valid visibility settings are public, unlisted, private, direct');
+        $r = new StatusRepository(new SerdeCommon(), $this->dataDir->url(), ['visibility' => 'everyone']);
+    }
+
     /**
      * @test
      * @dataProvider exampleStatusesByName()
@@ -53,6 +62,11 @@ class StatusRepositoryTest extends TestCase
         yield 'Text directory with visibility default' => [
             'name' => 'b',
             'defaults' => ['visibility' => Visibility::Unlisted],
+            'expected' => new Status('Testing B', visibility: Visibility::Unlisted),
+        ];
+        yield 'Text directory with visibility default as a string, which it is in the config file' => [
+            'name' => 'b',
+            'defaults' => ['visibility' => 'unlisted'],
             'expected' => new Status('Testing B', visibility: Visibility::Unlisted),
         ];
         yield 'Text directory with visibility and language defaults' => [
