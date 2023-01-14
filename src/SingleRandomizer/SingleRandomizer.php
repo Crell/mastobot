@@ -26,9 +26,10 @@ class SingleRandomizer implements PostStrategy
         $posterState = $state->posters[$def->directory()] ?? new SingleRandomizerState();
 
         $now = $this->clock->now();
-        $nextPostTime = $posterState->nextPostTime ?? $now;
+        $nextPostTime = $posterState->nextPostTime ?? null;
 
-        if ($now < $nextPostTime) {
+        // Bail early if it's not time to post anything yet.
+        if ($nextPostTime && $now < $nextPostTime) {
             return [];
         }
 
