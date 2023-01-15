@@ -26,6 +26,8 @@ class MockStatusRepo extends StatusRepository
 
     public function nameList(): array
     {
-        return array_keys($this->statuses);
+        $names = array_keys($this->statuses);
+        sort($names);
+        return $names;
     }
 }

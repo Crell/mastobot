@@ -41,8 +41,8 @@ class SequenceTest extends TestCase
         $def = new SequenceDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
 
         $mockRepo = new MockStatusRepo([
-            'a.txt' => new Status('A'),
             'b.txt' => new Status('B'),
+            'a.txt' => new Status('A'),
             'c.txt' => new Status('C'),
         ]);
 

@@ -24,11 +24,11 @@ trait FakeFilesystem
     {
         return [
             'data' => [
-                'a' => [
-                    'status.txt'    => 'Testing A',
-                ],
                 'b' => [
                     'status.txt'    => 'Testing B',
+                ],
+                'a' => [
+                    'status.txt'    => 'Testing A',
                 ],
                 'c' => [
                     'status.txt'    => 'Testing C',

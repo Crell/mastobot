@@ -27,6 +27,7 @@ class StatusRepositoryTest extends TestCase
 
         $names = $r->nameList();
         $expectedList = array_keys($this->getStructure()['data']);
+        sort($expectedList);
 
         self::assertEquals($expectedList, $names);
     }

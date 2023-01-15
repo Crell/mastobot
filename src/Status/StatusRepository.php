@@ -112,6 +112,8 @@ class StatusRepository
             $ret[] = $item->getBasename();
         }
 
+        sort($ret);
+
         return $ret;
     }
 }
