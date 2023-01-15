@@ -37,8 +37,7 @@ class StateLoaderTest extends TestCase
 
         self::assertEquals([], $state->posters);
 
-        // Force the destructor to run.
-        unset($state);
+        $l->save($state);
 
         // Verify the state file was saved out to disk.
         self::assertTrue($this->root->hasChild('filename.json'));
@@ -80,12 +79,6 @@ class StateLoaderTest extends TestCase
         // PHPStan doesn't know that the posters list is a SequenceState, but we do.
         // @phpstan-ignore-next-line
         self::assertEquals('a.txt', $state->posters['data']->lastStatus);
-
-        // Force the destructor to run.
-        unset($state);
-
-        // Verify the state file was saved out to disk.
-        self::assertTrue($this->root->hasChild('filename.json'));
     }
 
     /** @test */
@@ -108,8 +101,7 @@ class StateLoaderTest extends TestCase
         // @phpstan-ignore-next-line
         $state->posters['data']->lastStatus = 'b.txt';
 
-        // Force the destructor to run.
-        unset($state);
+        $l->save($state);
 
         // Verify the state file was saved out to disk.
         self::assertTrue($this->root->hasChild('filename.json'));

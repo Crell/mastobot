@@ -23,8 +23,6 @@ class StateLoader
             $state = new State();
         }
 
-        $state->setLoader($this);
-
         return $state;
     }
 

@@ -18,20 +18,4 @@ class State
     #[DictionaryField(arrayType: PosterState::class, keyType: KeyType::String)]
     public array $posters = [];
 
-    #[Field(exclude: true)]
-    private StateLoader $loader;
-
-    public function setLoader(StateLoader $loader): void
-    {
-        $this->loader = $loader;
-    }
-
-    public function __destruct()
-    {
-        // In tests we generally don't set the filename, so it doesn't try writing back.
-        if (isset($this->loader)) {
-            $this->loader->save($this);
-        }
-    }
-
 }

@@ -18,6 +18,8 @@ try {
     $state = $loader->load();
 
     $runner->run($state);
+
+    $loader->save($state);
 } catch (ErrorMessage $e) {
     print $e->getMessage() . PHP_EOL;
     exit(1);
