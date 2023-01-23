@@ -38,7 +38,7 @@ class SequenceTest extends TestCase
         $now = new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC'));
         $nowClock = new FrozenClock($now);
 
-        $def = new SequenceDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
+        $def = new SequenceDef(directory: $this->dataDir->url(), account: 'crell', minHours: 1, maxHours: 5);
 
         $mockRepo = new MockStatusRepo([
             'b.txt' => new Status('B'),
@@ -56,12 +56,13 @@ class SequenceTest extends TestCase
         };
 
         $state = new State();
+        $stateName = 'name';
         $sequenceState = new SequenceState(nextPostTime: $nextPostTime, lastStatus: $lastStatus);
-        $state->posters[$this->dataDir->url()] = $sequenceState;
+        $state->posters[$stateName] = $sequenceState;
 
         $s = new Sequence($nowClock, $repoFactory);
 
-        $result = $s->getStatuses($def, $state);
+        $result = $s->getStatuses($stateName, $def, $state);
 
         if ($expectEmpty) {
             self::assertEmpty($result);

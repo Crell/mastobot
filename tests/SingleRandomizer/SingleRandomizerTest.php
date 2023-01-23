@@ -35,7 +35,7 @@ class SingleRandomizerTest extends TestCase
         $now = new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC'));
         $nowClock = new FrozenClock($now);
 
-        $def = new SingleRandomizerDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
+        $def = new SingleRandomizerDef(directory: $this->dataDir->url(), account: 'crell', minHours: 1, maxHours: 5);
 
         $mockRepo = new MockStatusRepo([
             'a.txt' => new Status('A'),
@@ -53,12 +53,13 @@ class SingleRandomizerTest extends TestCase
         };
 
         $state = new State();
+        $stateName = 'name';
         $randomState = new SingleRandomizerState(nextPostTime: $nextPostTime);
-        $state->posters[$this->dataDir->url()] = $randomState;
+        $state->posters[$stateName] = $randomState;
 
         $s = new SingleRandomizer($nowClock, $repoFactory);
 
-        $result = $s->getStatuses($def, $state);
+        $result = $s->getStatuses($stateName, $def, $state);
 
         if ($expectEmpty) {
             self::assertCount(0, $result);

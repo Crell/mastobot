@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
-use Colorfield\Mastodon\MastodonAPI;
 use Crell\Mastobot\Clock\FrozenClock;
 use Crell\Mastobot\Sequence\Sequence;
 use Crell\Mastobot\Sequence\SequenceDef;
@@ -22,11 +21,9 @@ class RunnerTest extends TestCase
     /** @test */
     public function stuff(): void
     {
-        $api = $this->mockMastodonAPI();
-
-        $def = new SequenceDef(directory: 'data', minHours: 1, maxHours: 5);
+        $def = new SequenceDef(directory: 'data', account: 'crell', minHours: 1, maxHours: 5);
         $config = $this->makeConfig(
-            posters: [$def],
+            posters: ['name' => $def],
         );
 
         $clock = new FrozenClock(new \DateTimeImmutable('2022-12-25 12:00', new \DateTimeZone('UTC')));
@@ -49,26 +46,14 @@ class RunnerTest extends TestCase
         $container = new Container();
         $container[Sequence::class] = new Sequence($clock, $repoFactory);
 
-        $r = new Runner($container, $api, $config, new SerdeCommon());
+        $r = new Runner($container, new MockConnectionFactory(), $config, new SerdeCommon());
 
         $r->run(new State());
 
         // postCount is on our mock, but it's an anon class so we cannot type for it.
         // @phpstan-ignore-next-line
-        self::assertEquals(1, $api->postCount);
+        self::assertEquals(1, MockConnectionFactory::$postCount);
     }
 
-    protected function mockMastodonAPI(): MastodonAPI
-    {
-        return new class extends MastodonAPI {
-            public int $postCount = 0;
 
-            public function __construct() {}
-
-            public function post(mixed $endpoint, array $params = []): void
-            {
-                $this->postCount++;
-            }
-        };
-    }
 }

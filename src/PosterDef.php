@@ -31,4 +31,11 @@ interface PosterDef
      * @return string
      */
     public function directory(): string;
+
+    /**
+     * The account name this poster should use.
+     *
+     * @return string
+     */
+    public function account(): string;
 }

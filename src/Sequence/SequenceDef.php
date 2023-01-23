@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Crell\Mastobot\Sequence;
 
 use Crell\Mastobot\PosterDef;
+use Crell\Mastobot\PosterTrait;
 
 class SequenceDef implements PosterDef
 {
+    use PosterTrait;
+
     public function __construct(
         public readonly string $directory,
+        public readonly string $account,
         public readonly int $minHours,
         public readonly int $maxHours,
     ) {}
@@ -17,11 +21,6 @@ class SequenceDef implements PosterDef
     public function poster(): string
     {
         return Sequence::class;
-    }
-
-    public function directory(): string
-    {
-        return $this->directory;
     }
 
     public function minSeconds(): int

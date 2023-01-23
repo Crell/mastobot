@@ -6,8 +6,7 @@ namespace Crell\Mastobot;
 use Crell\Serde\Attributes\DictionaryField;
 use Crell\Serde\Attributes\Field;
 use Crell\Serde\Attributes\PostLoad;
-use Crell\Serde\Attributes\SequenceField;
-use Crell\Serde\Renaming\Cases;
+use Crell\Serde\KeyType;
 
 class Config
 {
@@ -27,17 +26,8 @@ class Config
         #[Field(serializedName: 'app_name')]
         public readonly string $appName,
 
-        #[Field(serializedName: 'app_instance')]
-        public readonly string $appInstance,
-
-        #[Field(renameWith: Cases::snake_case)]
-        public readonly string $clientId,
-
-        #[Field(renameWith: Cases::snake_case)]
-        public readonly string $clientSecret,
-
-        #[Field(serializedName: 'token')]
-        public readonly string $bearerToken,
+        #[DictionaryField(arrayType: AccountDef::class, keyType: KeyType::String)]
+        public readonly array $accounts = [],
 
         #[Field(serializedName: 'status_file')]
         public readonly ?string $stateFile = 'mastobot_state.json',
@@ -45,7 +35,7 @@ class Config
         #[DictionaryField]
         public readonly array $defaults = ['visibility' => Visibility::Unlisted],
 
-        #[SequenceField(arrayType: PosterDef::class)]
+        #[DictionaryField(arrayType: PosterDef::class, keyType: KeyType::String)]
         public readonly array $posters = [],
     ) {}
 
@@ -53,11 +43,7 @@ class Config
     private function validate(): void
     {
         match(true) {
-            empty($this->appName) => throw new \InvalidArgumentException('The app.name must be specified in mastobot.json.'),
-            empty($this->appInstance) => throw new \InvalidArgumentException('The app.instance must be specified in mastobot.json.'),
-            empty($this->clientId) => throw new \InvalidArgumentException('The client_id must be specified in mastobot.json.'),
-            empty($this->clientSecret) => throw new \InvalidArgumentException('The client_secret must be specified in mastobot.json.'),
-            empty($this->bearerToken) => throw new \InvalidArgumentException('The token must be specified in mastobot.json.'),
+            empty($this->appName) => throw new \InvalidArgumentException('The app.name must be specified in mastobot.yaml.'),
             default => null,
         };
     }

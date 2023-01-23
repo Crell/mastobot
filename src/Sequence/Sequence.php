@@ -20,10 +20,10 @@ class Sequence implements PostStrategy
     /**
      * @param SequenceDef $def
      */
-    public function getStatuses(PosterDef $def, State $state): array
+    public function getStatuses(string $defName, PosterDef $def, State $state): array
     {
         /** @var SequenceState $posterState */
-        $posterState = $state->posters[$def->directory()] ?? new SequenceState();
+        $posterState = $state->posters[$defName] ?? new SequenceState();
 
         $now = $this->clock->now();
         $nextPostTime = $posterState->nextPostTime ?? null;
@@ -53,7 +53,7 @@ class Sequence implements PostStrategy
         // Update the state now that we've posted (or will in a moment).
         $posterState->nextPostTime = $now->add($def->getRandomizedGap());
         $posterState->lastStatus = $nextStatusName;
-        $state->posters[$def->directory()] = $posterState;
+        $state->posters[$defName] = $posterState;
 
         return [$status];
     }

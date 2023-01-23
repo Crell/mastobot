@@ -25,7 +25,7 @@ class StatusRepoFactoryTest extends TestCase
     /** @test */
     public function missing_defaults_use_default_defaults(): void
     {
-        $def = new SequenceDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
+        $def = new SequenceDef(directory: $this->dataDir->url(), account: 'crell', minHours: 1, maxHours: 5);
         $config = $this->makeConfig(
             posters: [$def],
         );
@@ -47,7 +47,7 @@ class StatusRepoFactoryTest extends TestCase
      */
     public function defaults_passthrough(array $defaults): void
     {
-        $def = new SequenceDef(directory: $this->dataDir->url(), minHours: 1, maxHours: 5);
+        $def = new SequenceDef(directory: $this->dataDir->url(), account: 'crell', minHours: 1, maxHours: 5);
         $config = $this->makeConfig(
             posters: [$def],
             defaults: $defaults,

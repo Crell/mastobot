@@ -11,10 +11,14 @@ trait ConfigMaker
         // Add in junk required fields.
         $args += [
             'appName' => 'appname',
-            'appInstance' => 'an.instance',
-            'clientId' => 'abc',
-            'clientSecret' => 'def',
-            'bearerToken' => 'ghi',
+            'accounts' => [
+                'crell' => [
+                    'appInstance' => 'an.instance',
+                    'clientId' => 'abc',
+                    'clientSecret' => 'def',
+                    'bearerToken' => 'ghi',
+                ]
+            ]
         ];
 
         return new Config(...$args);
