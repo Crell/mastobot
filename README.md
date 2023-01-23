@@ -119,7 +119,7 @@ In this example, a random message in the `posts/quotes` directory will be posted
 
 ## Post directories
 
-Each strategy relies on a directory that contains status messages to post.  Mastobot supports four formats for posts, including both files and directories, all of which can be mixed-and-matched.  For the `sequence` strategy, files and directories are included together in the same lexical list.
+Each strategy relies on a directory that contains status messages to post.  Mastobot supports six formats for posts, including both files and directories, all of which can be mixed-and-matched.  For the `sequence` strategy, files and directories are included together in the same lexical list.
 
 ### Simple messages
 
@@ -137,12 +137,22 @@ Alternatively, a simple JSON message (a file ending in `.json`) allows specifyin
   "visibility": "unlisted"
 }
 ```
+### YAML messages
 
-### Text and JSON directories
+A status may be defined using YAML as well.  The above example in YAML would be:
+
+```yaml
+status: "The body of the status message.",
+spoiler_text: "The spoiler text or content warning, if any",
+language: "en",
+visibility: "unlisted"
+```
+
+### Directory definitions
 
 This support is mostly for future support for attaching media.  That doesn't work yet, so these aren't as useful for now but are fully supported.
 
-A directory may contain either a `status.txt` or `status.json` file, which will be read the same as a stand-alone file.  (In the future, image files in the directory will automatically be attached to the post.)
+A directory may contain either a `status.txt`, `status.json` or `status.yaml` file, which will be read the same as a stand-alone file.  (In the future, image files in the directory will automatically be attached to the post.)
 
 ## Why not use scheduled posts?
 

@@ -95,6 +95,21 @@ class StatusRepositoryTest extends TestCase
             'defaults' => ['visibility' => Visibility::Unlisted],
             'expected' => new Status('Testing F', visibility: Visibility::Unlisted, spoilerText: 'spoiler'),
         ];
+        yield 'YAML file with no defaults uses values from the file' => [
+            'name' => 'g.yaml',
+            'defaults' => [],
+            'expected' => new Status('Testing G', visibility: Visibility::Public),
+        ];
+        yield 'YAML file with defaults preferences values from the file' => [
+            'name' => 'g.yaml',
+            'defaults' => ['visibility' => Visibility::Unlisted, 'language' => 'en'],
+            'expected' => new Status('Testing G', visibility: Visibility::Public, language: 'en'),
+        ];
+        yield 'YAML directory with defaults preferences values from the file' => [
+            'name' => 'h',
+            'defaults' => ['visibility' => Visibility::Unlisted],
+            'expected' => new Status('Testing H', visibility: Visibility::Unlisted, spoilerText: 'spoiler'),
+        ];
         yield 'Not-found name returns null' => [
             'name' => 'nope',
             'defaults' => [],

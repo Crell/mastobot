@@ -61,6 +61,17 @@ class StatusRepository
             return $toot;
         }
 
+        // Allow just YAML files as tweets, with no directory.
+        if ($record->isFile() && $record->getExtension() === 'yaml') {
+            $status = file_get_contents((string)$record);
+            /** @var Status $toot */
+            $toot = $this->serde->deserialize($status, from: 'yaml', to: Status::class);
+            foreach ($this->defaults as $k => $v) {
+                $toot->$k ??= $v;
+            }
+            return $toot;
+        }
+
         // Directory support is mostly for later, once we want to allow
         // for attached media.  If you're not doing that, you probably don't
         // need to bother with directories.
@@ -78,6 +89,17 @@ class StatusRepository
                 $status = file_get_contents($jsonStatus);
                 /** @var Status $toot */
                 $toot = $this->serde->deserialize($status, from: 'json', to: Status::class);
+                foreach ($this->defaults as $k => $v) {
+                    $toot->$k ??= $v;
+                }
+                return $toot;
+            }
+
+            $yamlStatus = "$record/status.yaml";
+            if (file_exists($yamlStatus)) {
+                $status = file_get_contents($yamlStatus);
+                /** @var Status $toot */
+                $toot = $this->serde->deserialize($status, from: 'yaml', to: Status::class);
                 foreach ($this->defaults as $k => $v) {
                     $toot->$k ??= $v;
                 }

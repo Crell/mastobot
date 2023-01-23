@@ -37,6 +37,10 @@ trait FakeFilesystem
                 'e.json' => '{"status": "Testing E", "visibility": "public"}',
                 'f' => [
                     'status.json' => '{"status": "Testing F", "spoiler_text": "spoiler"}',
+                ],
+                'g.yaml' => "status: Testing G\nvisibility: public ",
+                'h' => [
+                    'status.yaml' => "status: Testing H\nspoiler_text: spoiler"
                 ]
             ],
         ];
