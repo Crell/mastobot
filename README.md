@@ -24,17 +24,21 @@ Mastobot will only post messages when cron runs, so, for example, if the bot run
 
 ## Configuration
 
-Mastobot is controlled via a `mastobot.json` file in project root.  There are five required properties, two optional, and one array to define how the bot should post messages.
+Mastobot is controlled via a `mastobot.yaml` file in project root.  The available keys are below.
 
 ### `app_name` (required)
 
 The name of your bot.  Should be a short, semi-unique human-readable name.  "Mastobot" is a reasonable default.
 
-### `app_instance` (required)
+### `accounts` (required)
+
+This is a named dictionary of account connection information.  There are four properties, all required.  The name of each account definition will be used by the `posters` list below, but is otherwise an arbitrary string.
+
+#### `app_instance` (required)
 
 The Mastodon instance to which the bot will post.  It should be just the domain name, no `http` or anything.  So `mastodon.social`, `phpc.social`, etc.
 
-### Authentication information (required)
+#### Authentication information (required)
 
 There are three identifiers you need from your profile to authenticate any Mastodon bot.  Mastobot does not include a mechanism to auto-generate those for you, by design, but they're simple to generate from the UI.
 
@@ -44,7 +48,7 @@ You may leave the rest of the settings at their default.  Or, if you'd rather lo
 
 Click "Save Changes" when you're done.
 
-The next page will show you three hash values: "Client Key", "Client Secret", and "Your access token".  Those are the three values we need.  Copy those values into `mastobot.json` as `client_key`, `client_secret`, and `token`, respectively.
+The next page will show you three hash values: "Client Key", "Client Secret", and "Your access token".  Those are the three values we need.  Copy those values into `mastobot.yaml` as `client_key`, `client_secret`, and `token`, respectively.
 
 ### `defaults`
 
@@ -73,6 +77,7 @@ At this time there are two available `strategy`s: `random` and `sequence`.
 
 Both strategies have three required configuration parameters:
 
+* `account` - The name of the credentials from the `accounts` section that this poster should use.  Defining multiple accounts allows a single Mastobot instance to power an arbitrary number of auto-posting accounts.
 * `directory` - The directory on disk where posts will be drawn from.  If a relative path, it will be evaluated relative to the project root.  It may also be an absolute path pointing to anywhere you wish.  The `directory` MUST be unique among all listed `posters`.
 * `minHours` - Two consecutive posts will be *at least* this many hours apart.
 * `maxHours` - Two consecutive posts will be *at most* this many hours apart, as of when Mastobot next runs.
@@ -83,21 +88,34 @@ Whenever a post is made, Mastobot will generate a random timestamp between `minH
 
 For clarity, here's an example of a possible (likely) configuration:
 
-```json
-{
-  "app_name": "Mastobot",
-  "app_instance": "phpc.social",
-  "client_id": "xxxx",
-  "client_secret": "yyyy",
-  "token": "zzzz",
-  "posters": [
-    { "strategy":  "random", "directory": "posts/quotes", "minHours": 20, "maxHours": 30},
-    { "strategy":  "sequence", "directory": "/home/me/posts/story", "minHours": 5, "maxHours": 6}
-  ]
-}
+```yaml
+app_name: "Mastobot"
+accounts:
+  crell:
+    app_instance: "phpc.social"
+    client_id: "xxxx"
+    client_secret: "yyyy"
+    token: "zzzz"
+
+defaults:
+  language: "en"
+
+posters:
+  quotes:
+    strategy: "random"
+    account: "crell"
+    directory: "posts/quotes"
+    minHours: 20
+    maxHours: 30
+  story:
+    strategy: "random"
+    account: "crell"
+    directory: "/home/me/posts/story"
+    minHours: 5
+    maxHours: 6
 ```
 
-In this example, a random message in the `posts/quotes` directory will be posted every 20-30 hours (that is, the gap between posts will be between 72,000 and 108,000 seconds).  Additionally, posts from the `/home/me/posts/story` directory will be posted in lexical order, with a gap of between 18,000 and 21,600 seconds between them.
+In this example, a random message in the `posts/quotes` directory will be posted every 20-30 hours (that is, the gap between posts will be between 72,000 and 108,000 seconds).  Additionally, posts from the `/home/me/posts/story` directory will be posted in lexical order, with a gap of between 18,000 and 21,600 seconds between them.  Both will be posted to the account on `phpc.social` defined by the `crell` account block.
 
 ## Post directories
 
