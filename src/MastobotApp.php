@@ -30,7 +30,7 @@ class MastobotApp extends Container
             /** @var Serde $serde */
             $serde = $c[Serde::class];
 
-            return $serde->deserialize(file_get_contents(Config::ConfigFileName), from: 'json', to: Config::class);
+            return $serde->deserialize(file_get_contents(Config::ConfigFileName), from: 'yaml', to: Config::class);
         };
 
         $this[MastodonOAuth::class] = static function (Container $c) {

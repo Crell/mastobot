@@ -11,7 +11,7 @@ use Crell\Serde\Renaming\Cases;
 
 class Config
 {
-    public const ConfigFileName = 'mastobot.json';
+    public const ConfigFileName = 'mastobot.yaml';
 
     /**
      * @param string $appName
