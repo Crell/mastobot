@@ -9,6 +9,7 @@ use Colorfield\Mastodon\MastodonOAuth;
 
 class ConnectionFactory
 {
+    /** @var array<string, MastodonAPI> */
     private array $connections = [];
 
     public function __construct(

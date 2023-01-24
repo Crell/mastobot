@@ -14,10 +14,7 @@ class Config
 
     /**
      * @param string $appName
-     * @param string $appInstance
-     * @param string $clientId
-     * @param string $clientSecret
-     * @param string $bearerToken
+     * @param array<string, AccountDef> $accounts
      * @param ?string $stateFile
      * @param array<string, mixed> $defaults
      * @param PosterDef[] $posters

@@ -16,10 +16,11 @@ parameters:
             message: '#Method (.*) has parameter (.*) with no value type specified in iterable type array.#'
             path: tests/
         # PHPStan is overly aggressive on readonly properties.
-        #- '#Class (.*) has an uninitialized readonly property (.*). Assign it in the constructor.#'
+        - '#Class (.*) has an uninitialized readonly property (.*). Assign it in the constructor.#'
         - '#Readonly property (.*) is assigned outside of the constructor.#'
 
         # This is a Serde callback, so it's used indirectly.
         - '#Method Crell\\Mastobot\\Config::validate\(\) is unused.#'
+        - '#Method Crell\\Mastobot\\AccountDef::validate\(\) is unused.#'
 
 

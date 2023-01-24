@@ -50,8 +50,6 @@ class RunnerTest extends TestCase
 
         $r->run(new State());
 
-        // postCount is on our mock, but it's an anon class so we cannot type for it.
-        // @phpstan-ignore-next-line
         self::assertEquals(1, MockConnectionFactory::$postCount);
     }
 
