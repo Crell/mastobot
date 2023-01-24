@@ -15,6 +15,8 @@ use Psr\Clock\ClockInterface;
 
 class MastobotApp extends Container
 {
+    protected const AppRoot = __DIR__ . '/../';
+
     /**
      * @param array<string, mixed> $values
      */
@@ -28,24 +30,15 @@ class MastobotApp extends Container
             /** @var Serde $serde */
             $serde = $c[Serde::class];
 
-            return $serde->deserialize(file_get_contents(Config::ConfigFileName), from: 'yaml', to: Config::class);
+            return $serde->deserialize(
+                \file_get_contents(self::AppRoot . Config::ConfigFileName),
+                from: 'yaml',
+                to: Config::class,
+            );
         };
 
         $this[ConnectionFactory::class] = static fn (Container $c)
             => new ConnectionFactory($c[Config::class]);
-//
-//        $this[MastodonOAuth::class] = static function (Container $c) {
-//            /** @var Config $config */
-//            $config = $c[Config::class];
-//            $oAuth = new MastodonOAuth($config->appName, $config->appInstance);
-//            $oAuth->config->setClientId($config->clientId);
-//            $oAuth->config->setClientSecret($config->clientSecret);
-//            $oAuth->config->setBearer($config->bearerToken);
-//            return $oAuth;
-//        };
-//
-//        $this[MastodonAPI::class] = static fn (Container $c)
-//            => new MastodonAPI($c[MastodonOAuth::class]->config);
 
         $this[ClockInterface::class] = static fn(Container $c) => new UtcClock();
 
