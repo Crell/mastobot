@@ -27,5 +27,6 @@
             "Crell\\Mastobot\\Benchmarks\\": "benchmarks"
         }
     },
+    "prefer-stable": true,
     "minimum-stability": "dev"
 }
