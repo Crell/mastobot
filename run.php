@@ -6,6 +6,10 @@ namespace Crell\Mastobot;
 
 require 'vendor/autoload.php';
 
+// Force the working directory to the project root, so that
+// relative paths behave as we expect.
+chdir(__DIR__);
+
 try {
     $app = new MastobotApp();
 
