@@ -7,14 +7,14 @@ namespace Crell\Mastobot;
 use Colorfield\Mastodon\MastodonAPI as BaseAPI;
 use Colorfield\Mastodon\ConfigurationVO;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Improved MastodonAPI
  *
  * The upstream class is kinda buggy, has bad error handling,
- * doesn't support media, and .  This class just overrides everything to fix that.
+ * doesn't support media, and is typed for PHP 5.
+ * This class just overrides everything to fix that.
  */
 class MastodonAPI extends BaseAPI
 {
@@ -34,20 +34,13 @@ class MastodonAPI extends BaseAPI
      * @return array
      *   Associative array of the JSON response.
      */
-    private function getResponse(string $endpoint, string $method, array $json): array
+    private function getResponse(string $endpoint, HttpMethod $method, array $json): array
     {
         $result = null;
         $uri = $this->config->getBaseUrl() . '/api/';
         $uri .= ConfigurationVO::API_VERSION . $endpoint;
 
-        // @todo Replace with an enum.
-        $allowedOperations = ['get', 'post'];
-        if(!in_array($method, $allowedOperations, true)) {
-            echo 'ERROR: only ' . implode(',', $allowedOperations) . 'are allowed';
-            return $result;
-        }
-
-        $response = $this->client->{$method}($uri, [
+        $response = $this->client->{$method->value}($uri, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->config->getBearer(),
             ],
@@ -65,7 +58,7 @@ class MastodonAPI extends BaseAPI
 
     private function responseIsOk(ResponseInterface $response): bool
     {
-        return floor($response->getStatusCode() / 100) === 200;
+        return $response->getStatusCode() >= 200 && $response->getStatusCode() < 300;
     }
 
     /**
@@ -78,7 +71,7 @@ class MastodonAPI extends BaseAPI
      */
     public function get($endpoint, array $params = []): array
     {
-        return $this->getResponse($endpoint, 'get', $params);
+        return $this->getResponse($endpoint, HttpMethod::Get, $params);
     }
 
     /**
@@ -91,7 +84,7 @@ class MastodonAPI extends BaseAPI
      */
     public function post($endpoint, array $params = []): array
     {
-        return $this->getResponse($endpoint, 'post', $params);
+        return $this->getResponse($endpoint, HttpMethod::Post, $params);
     }
 
     /**

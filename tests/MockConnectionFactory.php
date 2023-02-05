@@ -22,12 +22,6 @@ class MockConnectionFactory extends ConnectionFactory
             {
                 MockConnectionFactory::$postCount++;
             }
-
-
-            public function post(mixed $endpoint, array $params = []): void
-            {
-
-            }
         };
     }
 }
