@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
+use Crell\Mastobot\Status\Media;
+use Crell\Mastobot\Status\MediaAttachment;
 use Crell\Mastobot\Status\Status;
 use Crell\Serde\Serde;
+use function Crell\fp\prop;
 
 /**
  * An RPC-style client for interacting with Mastodon using defined types.
@@ -20,9 +23,10 @@ class MastodonClient
 
     public function postStatus(Status $status)
     {
-        foreach ($status->media as $file) {
-            $id = $this->postMedia($file);
-            $status->mediaIds[] = $id;
+        if ($status->media) {
+            $attachments = array_map($this->postMedia(...), $status->media);
+            $mediaIds = array_map(prop('id'), $attachments);
+            $status->mediaIds = $mediaIds;
         }
 
         $params = $this->serde->serialize($status, 'array');
@@ -30,17 +34,20 @@ class MastodonClient
         // @todo add decoding of the response.
     }
 
-    public function postMedia(\SplFileInfo $file)
+    public function postMedia(Media $media): MediaAttachment
     {
-        $bearer = $this->api->config->getBearer();
-        $file->getFilename();
+        $params = [];
+        if ($media->description) {
+            $params['description'] = $media->description;
+        }
+        if ($media->focus) {
+            $params['focus'] = ['x' => $media->focus->x, 'y' => $media->focus->y];
+        }
 
-        // Temporary hack at best.
-        $cmd = "curl -H \"Authorization: Bearer {$bearer}\" " .
-            '-X POST -H "Content-Type: multipart/form-data" https://phpc.social/api/v1/media ' .
-            "--form file=@{$file}";
+        $result = $this->api->postImage('/media', file: $media->file, thumbnail: $media->thumbnail, params: $params);
 
-        $result = `$cmd`;
-        $media1 = json_decode( $result );
+        /** @var MediaAttachment $attachment */
+        $attachment = $this->serde->deserialize($result, from: 'array', to: MediaAttachment::class);
+        return $attachment;
     }
 }

@@ -9,6 +9,7 @@ use Crell\Mastobot\Visibility;
 use Crell\Serde\Serde;
 use \SplFileInfo;
 use function Crell\fp\afilter;
+use function Crell\fp\indexBy;
 use function Crell\fp\pipe;
 
 class StatusRepository
@@ -82,36 +83,37 @@ class StatusRepository
         // Allow a directory with either JSON or text.
         if ($record->isDir()) {
             $textStatus = "$record/status.txt";
-            if (file_exists($textStatus)) {
-                $status = $this->loadTextStatus(new SplFileInfo($textStatus));
-            }
-
             $jsonStatus = "$record/status.json";
-            if (file_exists($jsonStatus)) {
-                $status = $this->loadStatusViaSerde(new SplFileInfo($jsonStatus), 'json');
-            }
-
             $yamlStatus = "$record/status.yaml";
-            if (file_exists($yamlStatus)) {
-                $status = $this->loadStatusViaSerde(new SplFileInfo($jsonStatus), 'yaml');
-            }
+            $status = match (true) {
+                file_exists($textStatus) => $this->loadTextStatus(new SplFileInfo($textStatus)),
+                file_exists($jsonStatus) => $this->loadStatusViaSerde(new SplFileInfo($jsonStatus), 'json'),
+                file_exists($yamlStatus) => $this->loadStatusViaSerde(new SplFileInfo($yamlStatus), 'yaml'),
+                default => null,
+            };
 
             // If there was no status file found, just stop.
             if (!isset($status)) {
                 return null;
             }
 
-            // Now check for images to attach.
-            $files = new \FilesystemIterator($record->getPath(),\FilesystemIterator::SKIP_DOTS);
-            $images = pipe(
-                $files,
-                afilter(fn(\SplFileInfo $file): bool
-                    => in_array($file->getExtension(), ['png', 'jpeg', 'jpg', 'gif', 'webp'], true)),
-            );
+            $isImage = fn (\SplFileInfo $file): bool
+                => in_array($file->getExtension(), ['png', 'jpeg', 'jpg', 'gif', 'webp'], true);
 
-            if ($images) {
-                $status->media = $images;
+            // Now check for images to attach.
+            $files = iterator_to_array(new \FilesystemIterator($record->getPath() . '/' . $record->getFilename(),\FilesystemIterator::SKIP_DOTS));
+
+            $images = array_filter($files, $isImage);
+
+            // Force lexical order.
+            $images = indexBy(fn(SplFileInfo $file) => $file->getFilename())($images);
+            ksort($images);
+
+            foreach ($images as $image) {
+                // @todo Figure out how to support thumbnails, descriptions, and focus.
+                $status->media[] = new Media(file: $image);
             }
+            return $status;
         }
 
         // If no status could be loaded from here.

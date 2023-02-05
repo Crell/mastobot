@@ -7,6 +7,7 @@ namespace Crell\Mastobot;
 use Colorfield\Mastodon\MastodonAPI as BaseAPI;
 use Colorfield\Mastodon\ConfigurationVO;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -19,8 +20,7 @@ use Psr\Http\Message\ResponseInterface;
 class MastodonAPI extends BaseAPI
 {
     public function __construct(
-        // @todo Only public temporarily to allow use by manual curl. Change later.
-        public readonly ConfigurationVO $config,
+        private readonly ConfigurationVO $config,
         private readonly Client $client = new Client(),
     ) {}
 
@@ -53,14 +53,41 @@ class MastodonAPI extends BaseAPI
         return $result;
     }
 
-    public function getFormResponse(string $endpoint, HttpMethod $method, array $json): array
+    public function postImage(string $endpoint, \SplFileInfo $file, ?\SplFileInfo $thumbnail = null, array $params = []): array
     {
-        $response = $this->client->{$method->value}($this->uri($endpoint), [
+        // I detest hate all the fugly arrays in the Guzzle API here.  Really hate it.
+        // If there's a better alternative, someone please tell me.
+
+        $segments[] = [
+            'name' => 'file',
+            'contents' => Utils::tryFopen((string)$file, 'r'),
+            'headers' => [
+                'content-type' => $this->getMimeType($file),
+            ],
+        ];
+
+        if ($thumbnail) {
+            $segments[] = [
+                'name' => 'thumbnail',
+                'contents' => Utils::tryFopen((string)$file, 'r'),
+                'headers' => [
+                    'content-type' => $this->getMimeType($file),
+                ],
+            ];
+        }
+
+        foreach ($params as $k => $v) {
+            $segments[] = [
+                'name' => $k,
+                'contents' => $v,
+            ];
+        }
+
+        $response = $this->client->post($this->uri($endpoint, 'v2'), [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->config->getBearer(),
-                'content-type' => 'multipart/form-data',
             ],
-            'json' => $json,
+            'multipart' => $segments,
         ]);
 
         if (!$this->responseIsOk($response)) {
@@ -72,9 +99,20 @@ class MastodonAPI extends BaseAPI
         return $result;
     }
 
-    private function uri(string $endpoint): string
+    private function getMimeType(\SplFileInfo $file): string
     {
-        return $this->config->getBaseUrl() . '/api/' . ConfigurationVO::API_VERSION . $endpoint;
+        return match ($file->getExtension()) {
+            'gif' => 'image/gif',
+            'png' => 'image/png',
+            'jpeg', 'jpg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            default => throw new \InvalidArgumentException('Unsupported file type: ' . $file->getExtension()),
+        };
+    }
+
+    private function uri(string $endpoint, string $version = 'v1'): string
+    {
+        return $this->config->getBaseUrl() . '/api/' . $version . $endpoint;
     }
 
     private function responseIsOk(ResponseInterface $response): bool

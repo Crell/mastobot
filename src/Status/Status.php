@@ -28,7 +28,7 @@ class Status
     public array $mediaIds = [];
 
     /**
-     * @param array<\SplFileInfo> $media
+     * @param array<Media> $media
      */
     #[Field(exclude: true)]
     public array $media = [];
