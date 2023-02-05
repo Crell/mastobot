@@ -13,7 +13,6 @@ class Runner
         private readonly Container $app,
         private readonly ConnectionFactory $connFactory,
         private readonly Config $config,
-        private readonly Serde $serde,
     ) {}
 
     public function run(State $state): void
@@ -23,8 +22,7 @@ class Runner
             /** @var PostStrategy $poster */
             $poster = $this->app[$posterDef->poster()];
             foreach ($poster->getStatuses($defName, $posterDef, $state) as $status) {
-                $params = $this->serde->serialize($status, 'array');
-                $reply = $conn->post('/statuses', $params);
+                $conn->postStatus($status);
             }
         }
     }

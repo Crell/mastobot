@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
-use Colorfield\Mastodon\MastodonAPI;
+use Crell\Mastobot\Status\Status;
 
 class MockConnectionFactory extends ConnectionFactory
 {
@@ -12,15 +12,21 @@ class MockConnectionFactory extends ConnectionFactory
 
     public function __construct() {}
 
-    public function getConnection(string $name): MastodonAPI
+    public function getConnection(string $name): MastodonClient
     {
-        return new class extends MastodonAPI {
+        return new class extends MastodonClient {
 
             public function __construct() {}
 
-            public function post(mixed $endpoint, array $params = []): void
+            public function postStatus(Status $status)
             {
                 MockConnectionFactory::$postCount++;
+            }
+
+
+            public function post(mixed $endpoint, array $params = []): void
+            {
+
             }
         };
     }

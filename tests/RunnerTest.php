@@ -46,7 +46,7 @@ class RunnerTest extends TestCase
         $container = new Container();
         $container[Sequence::class] = new Sequence($clock, $repoFactory);
 
-        $r = new Runner($container, new MockConnectionFactory(), $config, new SerdeCommon());
+        $r = new Runner($container, new MockConnectionFactory(), $config);
 
         $r->run(new State());
 

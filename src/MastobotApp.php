@@ -38,7 +38,7 @@ class MastobotApp extends Container
         };
 
         $this[ConnectionFactory::class] = static fn (Container $c)
-            => new ConnectionFactory($c[Config::class]);
+            => new ConnectionFactory($c[Config::class], $c[Serde::class]);
 
         $this[ClockInterface::class] = static fn(Container $c) => new UtcClock();
 
@@ -59,7 +59,6 @@ class MastobotApp extends Container
                 app: $c,
                 connFactory: $c[ConnectionFactory::class],
                 config: $c[Config::class],
-                serde: $c[Serde::class],
             );
     }
 }
