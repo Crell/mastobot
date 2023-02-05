@@ -19,8 +19,9 @@ use Psr\Http\Message\ResponseInterface;
 class MastodonAPI extends BaseAPI
 {
     public function __construct(
-        private ConfigurationVO $config,
-        private Client $client = new Client(),
+        // @todo Only public temporarily to allow use by manual curl. Change later.
+        public readonly ConfigurationVO $config,
+        private readonly Client $client = new Client(),
     ) {}
 
     /**
@@ -36,11 +37,7 @@ class MastodonAPI extends BaseAPI
      */
     private function getResponse(string $endpoint, HttpMethod $method, array $json): array
     {
-        $result = null;
-        $uri = $this->config->getBaseUrl() . '/api/';
-        $uri .= ConfigurationVO::API_VERSION . $endpoint;
-
-        $response = $this->client->{$method->value}($uri, [
+        $response = $this->client->{$method->value}($this->uri($endpoint), [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->config->getBearer(),
             ],
@@ -54,6 +51,30 @@ class MastodonAPI extends BaseAPI
 
         $result = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         return $result;
+    }
+
+    public function getFormResponse(string $endpoint, HttpMethod $method, array $json): array
+    {
+        $response = $this->client->{$method->value}($this->uri($endpoint), [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->config->getBearer(),
+                'content-type' => 'multipart/form-data',
+            ],
+            'json' => $json,
+        ]);
+
+        if (!$this->responseIsOk($response)) {
+            // @todo improve this error handling.
+            throw new \Exception('Bad response: ' . $response->getStatusCode() . ' ' . $response->getBody()->getContents());
+        }
+
+        $result = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        return $result;
+    }
+
+    private function uri(string $endpoint): string
+    {
+        return $this->config->getBaseUrl() . '/api/' . ConfigurationVO::API_VERSION . $endpoint;
     }
 
     private function responseIsOk(ResponseInterface $response): bool

@@ -20,8 +20,27 @@ class MastodonClient
 
     public function postStatus(Status $status)
     {
+        foreach ($status->media as $file) {
+            $id = $this->postMedia($file);
+            $status->mediaIds[] = $id;
+        }
+
         $params = $this->serde->serialize($status, 'array');
         $reply = $this->api->post('/statuses', $params);
         // @todo add decoding of the response.
+    }
+
+    public function postMedia(\SplFileInfo $file)
+    {
+        $bearer = $this->api->config->getBearer();
+        $file->getFilename();
+
+        // Temporary hack at best.
+        $cmd = "curl -H \"Authorization: Bearer {$bearer}\" " .
+            '-X POST -H "Content-Type: multipart/form-data" https://phpc.social/api/v1/media ' .
+            "--form file=@{$file}";
+
+        $result = `$cmd`;
+        $media1 = json_decode( $result );
     }
 }

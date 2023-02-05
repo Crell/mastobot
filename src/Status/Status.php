@@ -7,6 +7,7 @@ namespace Crell\Mastobot\Status;
 
 use Crell\Mastobot\Visibility;
 use Crell\Serde\Attributes\Field;
+use Crell\Serde\Attributes\SequenceField;
 use Crell\Serde\Renaming\Cases;
 
 /**
@@ -19,6 +20,19 @@ use Crell\Serde\Renaming\Cases;
  */
 class Status
 {
+    /**
+     * @var string[]
+     */
+    #[Field(serializedName: 'media_ids')]
+    #[SequenceField]
+    public array $mediaIds = [];
+
+    /**
+     * @param array<\SplFileInfo> $media
+     */
+    #[Field(exclude: true)]
+    public array $media = [];
+
     /**
      * Note that the order of arguments is *not* guaranteed, except that "status" comes first.
      *

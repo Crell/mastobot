@@ -7,6 +7,9 @@ namespace Crell\Mastobot\Status;
 use Crell\Mastobot\InvalidVisibility;
 use Crell\Mastobot\Visibility;
 use Crell\Serde\Serde;
+use \SplFileInfo;
+use function Crell\fp\afilter;
+use function Crell\fp\pipe;
 
 class StatusRepository
 {
@@ -19,11 +22,7 @@ class StatusRepository
         protected array $defaults,
     ) {
         if (isset($this->defaults['visibility']) && is_string($this->defaults['visibility'])) {
-            $visibility = Visibility::tryFrom($this->defaults['visibility']);
-            if (!$visibility) {
-                throw InvalidVisibility::create($this->defaults['visibility']);
-            }
-            $this->defaults['visibility'] = $visibility;
+            $this->defaults['visibility'] = Visibility::tryFrom($this->defaults['visibility']) ?? throw InvalidVisibility::create($this->defaults['visibility']);
         }
     }
 
@@ -42,34 +41,44 @@ class StatusRepository
         return $this->loadStatus($file);
     }
 
+    protected function loadTextStatus(\SplFileInfo $file): Status
+    {
+        $status = file_get_contents((string)$file);
+        return new Status($status, ...$this->defaults);
+    }
+
+    protected function loadStatusViaSerde(SplFileInfo $file, string $format): Status
+    {
+        $json = file_get_contents((string)$file);
+        /** @var Status $status */
+        $status = $this->serde->deserialize($json, from: $format, to: Status::class);
+        foreach ($this->defaults as $k => $v) {
+            $status->$k ??= $v;
+        }
+        return $status;
+    }
+
+    /**
+     * Loads a status object from the repository.
+     *
+     * For now we only support image-based media, as posting anything else
+     * requires asynchronous interaction with the server, which is much more involved.
+     */
     protected function loadStatus(\SplFileInfo $record): ?Status
     {
         // Allow just plain text files as tweets, with no directory.
         if ($record->isFile() && $record->getExtension() === 'txt') {
-            $status = file_get_contents((string)$record);
-            return new Status($status, ...$this->defaults);
+            return $this->loadTextStatus($record);
         }
 
         // Allow just JSON files as tweets, with no directory.
         if ($record->isFile() && $record->getExtension() === 'json') {
-            $status = file_get_contents((string)$record);
-            /** @var Status $toot */
-            $toot = $this->serde->deserialize($status, from: 'json', to: Status::class);
-            foreach ($this->defaults as $k => $v) {
-                $toot->$k ??= $v;
-            }
-            return $toot;
+            return $this->loadStatusViaSerde($record, 'json');
         }
 
         // Allow just YAML files as tweets, with no directory.
         if ($record->isFile() && $record->getExtension() === 'yaml') {
-            $status = file_get_contents((string)$record);
-            /** @var Status $toot */
-            $toot = $this->serde->deserialize($status, from: 'yaml', to: Status::class);
-            foreach ($this->defaults as $k => $v) {
-                $toot->$k ??= $v;
-            }
-            return $toot;
+            return $this->loadStatusViaSerde($record, 'yaml');
         }
 
         // Directory support is mostly for later, once we want to allow
@@ -80,36 +89,38 @@ class StatusRepository
         if ($record->isDir()) {
             $textStatus = "$record/status.txt";
             if (file_exists($textStatus)) {
-                $status = file_get_contents($textStatus);
-                return new Status($status, ...$this->defaults);
+                $status = $this->loadTextStatus(new SplFileInfo($textStatus));
             }
 
             $jsonStatus = "$record/status.json";
             if (file_exists($jsonStatus)) {
-                $status = file_get_contents($jsonStatus);
-                /** @var Status $toot */
-                $toot = $this->serde->deserialize($status, from: 'json', to: Status::class);
-                foreach ($this->defaults as $k => $v) {
-                    $toot->$k ??= $v;
-                }
-                return $toot;
+                $status = $this->loadStatusViaSerde(new SplFileInfo($jsonStatus), 'json');
             }
 
             $yamlStatus = "$record/status.yaml";
             if (file_exists($yamlStatus)) {
-                $status = file_get_contents($yamlStatus);
-                /** @var Status $toot */
-                $toot = $this->serde->deserialize($status, from: 'yaml', to: Status::class);
-                foreach ($this->defaults as $k => $v) {
-                    $toot->$k ??= $v;
-                }
-                return $toot;
+                $status = $this->loadStatusViaSerde(new SplFileInfo($jsonStatus), 'yaml');
             }
 
-            // @todo Add support for attaching media.
+            // If there was no status file found, just stop.
+            if (!isset($status)) {
+                return null;
+            }
+
+            // Now check for images to attach.
+            $files = new \FilesystemIterator($record->getPath(),\FilesystemIterator::SKIP_DOTS);
+            $images = pipe(
+                $files,
+                afilter(fn(\SplFileInfo $file): bool
+                    => in_array($file->getExtension(), ['png', 'jpeg', 'jpg', 'gif', 'webp'], true)),
+            );
+
+            if ($images) {
+                $status->media = $images;
+            }
         }
 
-        // If no toot could be loaded from here.
+        // If no status could be loaded from here.
         return null;
     }
 
