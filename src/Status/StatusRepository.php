@@ -66,19 +66,13 @@ class StatusRepository
      */
     protected function loadStatus(\SplFileInfo $record): ?Status
     {
-        // Allow just plain text files as tweets, with no directory.
-        if ($record->isFile() && $record->getExtension() === 'txt') {
-            return $this->loadTextStatus($record);
-        }
-
-        // Allow just JSON files as tweets, with no directory.
-        if ($record->isFile() && $record->getExtension() === 'json') {
-            return $this->loadStatusViaSerde($record, 'json');
-        }
-
-        // Allow just YAML files as tweets, with no directory.
-        if ($record->isFile() && $record->getExtension() === 'yaml') {
-            return $this->loadStatusViaSerde($record, 'yaml');
+        if ($record->isFile()) {
+            return match ($record->getExtension()) {
+                'txt' => $this->loadTextStatus($record),
+                'json' => $this->loadStatusViaSerde($record, 'json'),
+                'yaml' => $this->loadStatusViaSerde($record, 'yaml'),
+                default => null,
+            };
         }
 
         // Directory support is mostly for later, once we want to allow
