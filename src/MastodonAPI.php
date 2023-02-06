@@ -8,6 +8,7 @@ use Colorfield\Mastodon\MastodonAPI as BaseAPI;
 use Colorfield\Mastodon\ConfigurationVO;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Utils;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -38,10 +39,10 @@ class MastodonAPI extends BaseAPI
     private function getResponse(string $endpoint, HttpMethod $method, array $json): array
     {
         $response = $this->client->{$method->value}($this->uri($endpoint), [
-            'headers' => [
+            RequestOptions::HEADERS => [
                 'Authorization' => 'Bearer ' . $this->config->getBearer(),
             ],
-            'json' => $json,
+            RequestOptions::JSON => $json,
         ]);
 
         if (!$this->responseIsOk($response)) {
@@ -84,10 +85,10 @@ class MastodonAPI extends BaseAPI
         }
 
         $response = $this->client->post($this->uri($endpoint, 'v2'), [
-            'headers' => [
+            RequestOptions::HEADERS => [
                 'Authorization' => 'Bearer ' . $this->config->getBearer(),
             ],
-            'multipart' => $segments,
+            RequestOptions::MULTIPART => $segments,
         ]);
 
         if (!$this->responseIsOk($response)) {

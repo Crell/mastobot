@@ -41,7 +41,7 @@ class MastodonClient
             $params['description'] = $media->description;
         }
         if ($media->focus) {
-            $params['focus'] = ['x' => $media->focus->x, 'y' => $media->focus->y];
+            $params['focus'] = $media->focus->asString();
         }
 
         $result = $this->api->postImage('/media', file: $media->file, thumbnail: $media->thumbnail, params: $params);

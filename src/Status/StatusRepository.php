@@ -61,9 +61,6 @@ class StatusRepository
 
     /**
      * Loads a status object from the repository.
-     *
-     * For now we only support image-based media, as posting anything else
-     * requires asynchronous interaction with the server, which is much more involved.
      */
     protected function loadStatus(\SplFileInfo $record): ?Status
     {
@@ -97,27 +94,55 @@ class StatusRepository
                 return null;
             }
 
-            $isImage = fn (\SplFileInfo $file): bool
-                => in_array($file->getExtension(), ['png', 'jpeg', 'jpg', 'gif', 'webp'], true);
-
-            // Now check for images to attach.
-            $files = iterator_to_array(new \FilesystemIterator($record->getPath() . '/' . $record->getFilename(),\FilesystemIterator::SKIP_DOTS));
-
-            $images = array_filter($files, $isImage);
-
-            // Force lexical order.
-            $images = indexBy(fn(SplFileInfo $file) => $file->getFilename())($images);
-            ksort($images);
-
-            foreach ($images as $image) {
-                // @todo Figure out how to support thumbnails, descriptions, and focus.
-                $status->media[] = new Media(file: $image);
-            }
-            return $status;
+            return $this->attachMedia($status, $record);
         }
 
         // If no status could be loaded from here.
         return null;
+    }
+
+    /**
+     * Attach any relevant media to a Status.
+     *
+     * For now we only support image-based media, as posting anything else
+     * requires asynchronous interaction with the server, which is much more involved.
+     */
+    protected function attachMedia(Status $status, SplFileInfo $record): Status
+    {
+        $isImage = static fn (\SplFileInfo $file): bool
+           => in_array($file->getExtension(), ['png', 'jpeg', 'jpg', 'gif', 'webp'], true);
+
+        // Now check for images to attach.
+        $files = iterator_to_array(new \FilesystemIterator($record->getPath() . '/' . $record->getFilename(),\FilesystemIterator::SKIP_DOTS));
+        $files = indexBy(fn(SplFileInfo $file) => $file->getFilename())($files);
+
+        $images = array_filter($files, $isImage);
+
+        // Force lexical order.
+        ksort($images);
+
+        /** @var SplFileInfo $image */
+        foreach ($images as $image) {
+            $fileBase = $image->getBasename($image->getExtension());
+            $jsonFile = $fileBase . 'json';
+            $yamlFile = $fileBase . 'yaml';
+            $status->media[] = match (true) {
+                isset($files[$jsonFile]) => $this->loadMediaViaSerde($files[$jsonFile], $image,'json'),
+                isset($files[$yamlFile]) => $this->loadMediaViaSerde($files[$yamlFile], $image,'yaml'),
+                default => new Media(file: $image),
+            };
+            // @todo Thumbnails
+        }
+        return $status;
+    }
+
+    protected function loadMediaViaSerde(SplFileInfo $mediaDataFile, SplFileInfo $imageFile, string $format): Media
+    {
+        $json = file_get_contents((string)$mediaDataFile);
+        /** @var Media $media */
+        $media = $this->serde->deserialize($json, from: $format, to: Media::class);
+        $media->file = $imageFile;
+        return $media;
     }
 
     /**
