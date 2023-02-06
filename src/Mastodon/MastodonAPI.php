@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Crell\Mastobot\Mastodon;
 
 use Colorfield\Mastodon\ConfigurationVO;
-use Colorfield\Mastodon\MastodonAPI as BaseAPI;
 use Crell\Mastobot\HttpMethod;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Utils;
@@ -15,11 +14,9 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Improved MastodonAPI
  *
- * The upstream class is kinda buggy, has bad error handling,
- * doesn't support media, and is typed for PHP 5.
- * This class just overrides everything to fix that.
+ * Loosely-based on the colorfield version of this class, but heavily rewritten.
  */
-class MastodonAPI extends BaseAPI
+class MastodonAPI
 {
     public function __construct(
         private readonly ConfigurationVO $config,
