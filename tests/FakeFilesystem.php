@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
+use bovigo\vfs\content\LargeFileContent;
 use bovigo\vfs\vfsStream;
 use bovigo\vfs\vfsStreamContent;
 use bovigo\vfs\vfsStreamDirectory;
@@ -41,7 +42,29 @@ trait FakeFilesystem
                 'g.yaml' => "status: Testing G\nvisibility: public ",
                 'h' => [
                     'status.yaml' => "status: Testing H\nspoiler_text: spoiler"
-                ]
+                ],
+                'i' => [
+                    'status.txt' => 'Testing images',
+                    'image.png' => vfsStream::newFile('image.png')
+                        ->withContent(LargeFileContent::withKilobytes(10)),
+                ],
+                'j' => [
+                    'status.txt' => 'Testing images',
+                    'image.jpg' => vfsStream::newFile('image.jpg')
+                        ->withContent(LargeFileContent::withKilobytes(10)),
+                ],
+                'k' => [
+                    'status.txt' => 'Testing images',
+                    'image.json' => '{"description": "alt text"}',
+                    'image.jpg' => vfsStream::newFile('image.jpg')
+                        ->withContent(LargeFileContent::withKilobytes(10)),
+                ],
+                'l' => [
+                    'status.txt' => 'Testing images',
+                    'image.yaml' => 'description: alt text',
+                    'image.jpg' => vfsStream::newFile('image.jpg')
+                        ->withContent(LargeFileContent::withKilobytes(10)),
+                ],
             ],
         ];
     }

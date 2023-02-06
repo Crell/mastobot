@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot\Status;
 
+use bovigo\vfs\vfsStream;
 use Crell\Mastobot\FakeFilesystem;
 use Crell\Mastobot\InvalidVisibility;
+use Crell\Mastobot\Mastodon\Model\Media;
 use Crell\Mastobot\Mastodon\Model\Status;
 use Crell\Mastobot\Visibility;
 use Crell\Serde\SerdeCommon;
@@ -116,6 +118,48 @@ class StatusRepositoryTest extends TestCase
             'defaults' => [],
             'expected' => null,
         ];
+
+        // Media
+        $s = new Status('Testing images');
+        $s->media[] = new Media(
+            new \SplFileInfo(vfsStream::url('root/data/i/image.png')),
+        );
+        yield 'png image is included' => [
+            'name' => 'i',
+            'defaults' => [],
+            'expected' => $s,
+        ];
+
+        $s = new Status('Testing images');
+        $s->media[] = new Media(new \SplFileInfo(vfsStream::url('root/data/j/image.jpg')));
+        yield 'jpg image is included' => [
+            'name' => 'j',
+            'defaults' => [],
+            'expected' => $s,
+        ];
+
+        $s = new Status('Testing images');
+        $s->media[] = new Media(
+            new \SplFileInfo(vfsStream::url('root/data/k/image.jpg')),
+            description: 'alt text',
+        );
+        yield 'jpg image with json metadata' => [
+            'name' => 'k',
+            'defaults' => [],
+            'expected' => $s,
+        ];
+
+        $s = new Status('Testing images');
+        $s->media[] = new Media(
+            new \SplFileInfo(vfsStream::url('root/data/l/image.jpg')),
+            description: 'alt text',
+        );
+        yield 'jpg image with yaml metadata' => [
+            'name' => 'l',
+            'defaults' => [],
+            'expected' => $s,
+        ];
+
     }
 
     /**
