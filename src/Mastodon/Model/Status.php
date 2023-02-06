@@ -15,7 +15,6 @@ use Crell\Serde\Renaming\Cases;
  *
  * Always use the constructor with named arguments, as the order of parameters is not guaranteed.
  *
- * @todo Add Media
  * @todo Add Polls
  */
 class Status
