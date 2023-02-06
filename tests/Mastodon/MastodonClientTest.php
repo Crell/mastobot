@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot\Mastodon;
 
-use Crell\Mastobot\Mastodon\Model\Media;
 use Crell\Mastobot\Mastodon\Model\Status;
 use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
