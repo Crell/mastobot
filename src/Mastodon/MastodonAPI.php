@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Crell\Mastobot;
+namespace Crell\Mastobot\Mastodon;
 
-use Colorfield\Mastodon\MastodonAPI as BaseAPI;
 use Colorfield\Mastodon\ConfigurationVO;
+use Colorfield\Mastodon\MastodonAPI as BaseAPI;
+use Crell\Mastobot\HttpMethod;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\RequestOptions;

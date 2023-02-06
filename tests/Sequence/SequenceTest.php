@@ -6,10 +6,10 @@ namespace Crell\Mastobot\Sequence;
 
 use Crell\Mastobot\Clock\FrozenClock;
 use Crell\Mastobot\FakeFilesystem;
+use Crell\Mastobot\Mastodon\Model\Status;
 use Crell\Mastobot\MockStatusRepo;
 use Crell\Mastobot\PosterDef;
 use Crell\Mastobot\State;
-use Crell\Mastobot\Status\Status;
 use Crell\Mastobot\Status\StatusRepoFactory;
 use Crell\Mastobot\Status\StatusRepository;
 use PHPUnit\Framework\TestCase;

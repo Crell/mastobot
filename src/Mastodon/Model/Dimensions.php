@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\Mastobot\Status;
+namespace Crell\Mastobot\Mastodon\Model;
 
 class Dimensions
 {

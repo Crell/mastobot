@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Crell\Mastobot\Status;
 
 use Crell\Mastobot\InvalidVisibility;
+use Crell\Mastobot\Mastodon\Model\Media;
+use Crell\Mastobot\Mastodon\Model\Status;
 use Crell\Mastobot\Visibility;
 use Crell\Serde\Serde;
-use \SplFileInfo;
-use function Crell\fp\afilter;
+use SplFileInfo;
 use function Crell\fp\indexBy;
-use function Crell\fp\pipe;
 
 class StatusRepository
 {

@@ -6,6 +6,7 @@ namespace Crell\Mastobot\Status;
 
 use Crell\Mastobot\FakeFilesystem;
 use Crell\Mastobot\InvalidVisibility;
+use Crell\Mastobot\Mastodon\Model\Status;
 use Crell\Mastobot\Visibility;
 use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;

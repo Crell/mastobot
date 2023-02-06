@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Crell\Mastobot;
 
 use Crell\Mastobot\Clock\FrozenClock;
+use Crell\Mastobot\Mastodon\Model\Status;
 use Crell\Mastobot\Sequence\Sequence;
 use Crell\Mastobot\Sequence\SequenceDef;
-use Crell\Mastobot\Status\Status;
 use Crell\Mastobot\Status\StatusRepoFactory;
 use Crell\Mastobot\Status\StatusRepository;
-use Crell\Serde\SerdeCommon;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 

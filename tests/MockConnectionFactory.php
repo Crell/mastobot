@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot;
 
-use Crell\Mastobot\Status\Status;
+use Crell\Mastobot\Mastodon\MastodonClient;
+use Crell\Mastobot\Mastodon\Model\Status;
 
 class MockConnectionFactory extends ConnectionFactory
 {

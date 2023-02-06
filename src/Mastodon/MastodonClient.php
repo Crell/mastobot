@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Crell\Mastobot;
+namespace Crell\Mastobot\Mastodon;
 
-use Crell\Mastobot\Status\Media;
-use Crell\Mastobot\Status\MediaAttachment;
-use Crell\Mastobot\Status\Status;
+use Crell\Mastobot\Mastodon\Model\Media;
+use Crell\Mastobot\Mastodon\Model\MediaAttachment;
+use Crell\Mastobot\Mastodon\Model\Status;
 use Crell\Serde\Serde;
 use function Crell\fp\prop;
 

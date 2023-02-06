@@ -6,6 +6,8 @@ namespace Crell\Mastobot;
 
 
 use Colorfield\Mastodon\MastodonOAuth;
+use Crell\Mastobot\Mastodon\MastodonAPI;
+use Crell\Mastobot\Mastodon\MastodonClient;
 use Crell\Serde\Serde;
 
 class ConnectionFactory
