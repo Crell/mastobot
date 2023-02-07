@@ -150,9 +150,23 @@ visibility: "unlisted"
 
 ### Directory definitions
 
-This support is mostly for future support for attaching media.  That doesn't work yet, so these aren't as useful for now but are fully supported.
+A status may also be defined as a directory.  That allows for the inclusion of attached media, as well as metadata for that media.  At this time only images are supported, not audio or video.
 
-A directory may contain either a `status.txt`, `status.json` or `status.yaml` file, which will be read the same as a stand-alone file.  (In the future, image files in the directory will automatically be attached to the post.)
+If a directory contains a `status.txt`, `status.json`, or `status.yaml` file (checked in that order), it will be parsed the same way as a stand-alone file.  
+
+Additionally, any `.gif`, `.png`, `.jpg`, `.jpeg`, or `.webp` files in the directory will be attached to the status message, in lexical order.
+
+Optionally, you may also include a `json` or `yaml` file with a name matching the image file.  That file contains additional metadata for the image, such as alt-text.  The potential values are listed below.
+
+```yaml
+description: The alt text for this image, which you should always include.
+# The position of the image that should be focused on when cropping.
+focus:
+  x: 0.2
+  y: -0.2
+```
+
+You are strongly encouraged to always at least include a description, for accessibility.
 
 ## Why not use scheduled posts?
 

@@ -6,7 +6,6 @@ namespace Crell\Mastobot\Mastodon\Model;
 
 class Media
 {
-    // @todo Figure out attaching thumbnails.
     public function __construct(
         public \SplFileInfo $file,
         public ?\SplFileInfo $thumbnail = null,
