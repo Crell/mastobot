@@ -27,6 +27,15 @@
             "Crell\\Mastobot\\Benchmarks\\": "benchmarks"
         }
     },
+    "scripts": {
+        "test": "phpunit",
+        "phpstan": "phpstan",
+        "coverage": "php -dextension=pcov.so -dpcov.enabled=1 -dpcov.directory=src vendor/bin/phpunit --coverage-text",
+        "all-checks": [
+            "phpunit",
+            "phpstan"
+        ]
+    },
     "prefer-stable": true,
     "minimum-stability": "dev"
 }
