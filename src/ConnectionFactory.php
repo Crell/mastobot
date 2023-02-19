@@ -35,6 +35,9 @@ class ConnectionFactory
         return new MastodonClient(new MastodonAPI($oAuth->config), $this->serde);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function createOAuth(string $appName, AccountDef $config): MastodonOAuth
     {
         $oAuth = new MastodonOAuth($appName, $config->appInstance);

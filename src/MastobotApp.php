@@ -13,6 +13,9 @@ use Crell\Serde\SerdeCommon;
 use Pimple\Container;
 use Psr\Clock\ClockInterface;
 
+/**
+ * @codeCoverageIgnore
+ */
 class MastobotApp extends Container
 {
     protected const AppRoot = __DIR__ . '/../';
@@ -26,16 +29,11 @@ class MastobotApp extends Container
 
         $this[Serde::class] = static fn (Container $c) => new SerdeCommon();
 
-        $this[Config::class] = static function (Container $c) {
-            /** @var Serde $serde */
-            $serde = $c[Serde::class];
+        $this[ConfigLoader::class] = static fn (Container $c)
+            => new ConfigLoader($c[Serde::class], self::AppRoot);
 
-            return $serde->deserialize(
-                \file_get_contents(self::AppRoot . Config::ConfigFileName),
-                from: 'yaml',
-                to: Config::class,
-            );
-        };
+        $this[Config::class] = static fn (Container $c)
+            => $c[ConfigLoader::class]->load();
 
         $this[ConnectionFactory::class] = static fn (Container $c)
             => new ConnectionFactory($c[Config::class], $c[Serde::class]);

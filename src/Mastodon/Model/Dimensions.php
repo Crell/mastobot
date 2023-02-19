@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot\Mastodon\Model;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Dimensions
 {
     public function __construct(

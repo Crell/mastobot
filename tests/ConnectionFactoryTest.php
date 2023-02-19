@@ -12,7 +12,7 @@ class ConnectionFactoryTest extends TestCase
     /**
      * @test
      */
-    public function stuff(): void
+    public function missing_account_throws_exception(): void
     {
         $this->expectException(MissingAccountDefinition::class);
 

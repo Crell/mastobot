@@ -6,6 +6,9 @@ namespace Crell\Mastobot\Mastodon\Model;
 
 use Crell\Serde\Attributes\Field;
 
+/**
+ * @codeCoverageIgnore
+ */
 class MediaAttachment
 {
     public function __construct(

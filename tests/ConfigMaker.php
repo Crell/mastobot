@@ -12,13 +12,13 @@ trait ConfigMaker
         $args += [
             'appName' => 'appname',
             'accounts' => [
-                'crell' => [
-                    'appInstance' => 'an.instance',
-                    'clientId' => 'abc',
-                    'clientSecret' => 'def',
-                    'bearerToken' => 'ghi',
-                ]
-            ]
+                'crell' => new AccountDef(
+                    appInstance: 'an.instance',
+                    clientId:  'abc',
+                    clientSecret: 'def',
+                    bearerToken: 'ghi',
+                )
+            ],
         ];
 
         return new Config(...$args);

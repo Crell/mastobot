@@ -28,7 +28,7 @@ class AccountDef
     private function validate(): void
     {
         match(true) {
-            empty($this->appInstance) => throw new \InvalidArgumentException('The app.instance must be specified in mastobot.yaml.'),
+            empty($this->appInstance) => throw new \InvalidArgumentException('The app_instance must be specified in mastobot.yaml.'),
             empty($this->clientId) => throw new \InvalidArgumentException('The client_id must be specified in mastobot.yaml.'),
             empty($this->clientSecret) => throw new \InvalidArgumentException('The client_secret must be specified in mastobot.yaml.'),
             empty($this->bearerToken) => throw new \InvalidArgumentException('The token must be specified in mastobot.yaml.'),

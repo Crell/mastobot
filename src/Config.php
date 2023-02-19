@@ -40,7 +40,8 @@ class Config
     private function validate(): void
     {
         match(true) {
-            empty($this->appName) => throw new \InvalidArgumentException('The app.name must be specified in mastobot.yaml.'),
+            empty($this->appName) => throw new \InvalidArgumentException('The app_name must be specified in mastobot.yaml.'),
+            empty($this->accounts) => throw new \InvalidArgumentException('You must specify at least one user account in mastobot.yaml'),
             default => null,
         };
     }

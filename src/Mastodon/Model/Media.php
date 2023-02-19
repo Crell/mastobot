@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Crell\Mastobot\Mastodon\Model;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Media
 {
     public function __construct(
