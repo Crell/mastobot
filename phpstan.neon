@@ -22,5 +22,7 @@ parameters:
         # This is a Serde callback, so it's used indirectly.
         - '#Method Crell\\Mastobot\\Config::validate\(\) is unused.#'
         - '#Method Crell\\Mastobot\\AccountDef::validate\(\) is unused.#'
+        - '#Method Crell\\Mastobot\\Mastodon\\Model\\Point::validate\(\) is unused.#'
 
-
+        # This seems to be just a straight up bug in PHPStan?
+        - '#Property Crell\\Mastobot\\Mastodon\\Model\\Status::\$media type has no value type specified in iterable type array.#'

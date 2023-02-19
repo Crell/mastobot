@@ -19,7 +19,7 @@ class MockConnectionFactory extends ConnectionFactory
 
             public function __construct() {}
 
-            public function postStatus(Status $status)
+            public function postStatus(Status $status): void
             {
                 MockConnectionFactory::$postCount++;
             }

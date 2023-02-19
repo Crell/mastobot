@@ -21,7 +21,10 @@ class MastodonClient
         private readonly Serde $serde,
     ) {}
 
-    public function postStatus(Status $status)
+    /**
+     * @todo Decode the result and return it.
+     */
+    public function postStatus(Status $status): void
     {
         if ($status->media) {
             $attachments = array_map($this->postMedia(...), $status->media);

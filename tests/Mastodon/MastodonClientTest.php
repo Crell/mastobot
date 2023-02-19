@@ -20,7 +20,7 @@ class MastodonClientTest extends TestCase
         $api = new class extends MastodonAPI {
             public function __construct() {}
 
-            public function post($endpoint, array $params = []): array
+            public function post(string $endpoint, array $params = []): array
             {
                 assertArrayNotHasKey('language', $params);
                 assertSame('test', $params['status']);

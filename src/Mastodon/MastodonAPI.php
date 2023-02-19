@@ -28,10 +28,10 @@ class MastodonAPI
      *
      * @param string $endpoint
      *   The URL path to hit.
-     * @param array $json
+     * @param array<string, mixed> $json
      *   Associative array of the JSON payload.
      *
-     * @return array
+     * @return array<string, mixed>
      *   Associative array of the JSON response.
      */
     private function getResponse(string $endpoint, HttpMethod $method, array $json): array
@@ -52,6 +52,10 @@ class MastodonAPI
         return $result;
     }
 
+    /**
+     * @param array{description?: string, focus?: string} $params
+     * @return array<string, mixed>
+     */
     public function postImage(string $endpoint, \SplFileInfo $file, ?\SplFileInfo $thumbnail = null, array $params = []): array
     {
         // I detest hate all the fugly arrays in the Guzzle API here.  Really hate it.
@@ -122,12 +126,11 @@ class MastodonAPI
     /**
      * Get operation.
      *
-     * @param $endpoint
-     * @param array $params
+     * @param array<string, mixed> $params
      *
-     * @return mixed|null
+     * @return array<string, mixed>
      */
-    public function get($endpoint, array $params = []): array
+    public function get(string $endpoint, array $params = []): array
     {
         return $this->getResponse($endpoint, HttpMethod::Get, $params);
     }
@@ -135,12 +138,12 @@ class MastodonAPI
     /**
      * Post operation.
      *
-     * @param $endpoint
-     * @param array $params
+     * @param string $endpoint
+     * @param array<string, mixed> $params
      *
-     * @return mixed|null
+     * @return array<string, mixed>
      */
-    public function post($endpoint, array $params = []): array
+    public function post(string $endpoint, array $params = []): array
     {
         return $this->getResponse($endpoint, HttpMethod::Post, $params);
     }
@@ -148,17 +151,10 @@ class MastodonAPI
     /**
      * Delete operation.
      *
-     * @param $endpoint
-     * @param array $params
+     * @param array<string, mixed> $params
      *
-     * @return mixed|null
      */
-    public function delete($endpoint, array $params = [])
-    {
-        // @todo implement
-    }
-
-    public function stream($endpoint)
+    public function delete(string $endpoint, array $params = []): void
     {
         // @todo implement
     }
